@@ -1,4 +1,8 @@
+from dataclasses import dataclass, asdict
+import uuid
+
+
+@dataclass
 class Shop:
-    def __init__(self, id: str, nome: str):
-        self.id = id
-        self.nome = nome
+    id: uuid.UUID
+    name: str 

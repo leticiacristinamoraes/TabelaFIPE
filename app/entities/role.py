@@ -1,4 +1,8 @@
+from dataclasses import dataclass, asdict
+import uuid
+
+
+@dataclass
 class Role:
-    def __init__(self, id: str, name: str):
-        self.id = id
-        self.name = name
+    id: uuid.UUID
+    name: str 

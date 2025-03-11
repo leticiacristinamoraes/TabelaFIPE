@@ -1,7 +1,11 @@
+from dataclasses import dataclass, asdict
+import datetime
+import uuid
+
+@dataclass
 class Register:
-    def __init__(self, id: str, loja_id: str, carro_id: str, created_date: str, preco: str):
-        self.id = id
-        self.loja_id = loja_id
-        self.carro_id = carro_id
-        self.created_date = created_date
-        self.preco = preco
+    id: uuid.UUID
+    car_id: uuid
+    shop_id: uuid 
+    price: str
+    created_date: datetime.datetime

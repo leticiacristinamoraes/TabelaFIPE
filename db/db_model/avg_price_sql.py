@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
 Base = declarative_base()
-class RolePermission(Base):
+class AvgPriceDBModel(Base):
     __tablename__ = 'Avg_price'
     id = Column(String, primary_key=True)
     car_id = Column(String, ForeignKey('Cars.id'))

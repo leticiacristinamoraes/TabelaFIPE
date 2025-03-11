@@ -1,7 +1,10 @@
-class User:
-    def __init__(self, id: str, name: str, email: str):
-        self.id = id
-        self.name = name
-        self.email = email
+from dataclasses import dataclass, asdict
+import uuid
 
-        
+
+@dataclass
+class User:
+    id: uuid.UUID
+    name: str 
+    email: str
+
