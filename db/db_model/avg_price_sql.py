@@ -9,5 +9,5 @@ class AvgPriceDBModel(Base):
     id = Column(uuid.UUID, primary_key=True)
     car_id = Column(uuid.UUID, ForeignKey('Cars.id'))
     avg_price = Column(String)
-    car = relationship("Cars")
+    car = relationship("Car")
     

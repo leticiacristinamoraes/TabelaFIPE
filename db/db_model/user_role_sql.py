@@ -9,5 +9,5 @@ class UserRoleDBModel(Base):
     id = Column(uuid.UUID, primary_key=True)
     user_id = Column(uuid.UUID, ForeignKey('Users.id'))
     role_id = Column(uuid.UUID, ForeignKey('Roles.id'))
-    user = relationship("Users")
-    role = relationship("Roles")
+    user = relationship("User")
+    role = relationship("Role")

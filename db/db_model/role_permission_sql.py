@@ -9,6 +9,6 @@ class RolePermissionDBModel(Base):
     id = Column(uuid.UUID, primary_key=True)
     role_id = Column(uuid.UUID, ForeignKey('Permissions.id'))
     permission_id = Column(uuid.UUID, ForeignKey('Roles.id'))
-    role = relationship("Roles")
-    permission = relationship("Permissions")
+    role = relationship("Role")
+    permission = relationship("Permission")
     

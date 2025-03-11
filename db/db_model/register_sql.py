@@ -11,5 +11,5 @@ class RegisterDBModel(Base):
     car_id = Column(uuid.UUID, ForeignKey('Cars.id'))
     created_date = Column(Date)
     price = Column(String)
-    shop = relationship("Shops")
-    car = relationship("Cars")
+    shop = relationship("Shop")
+    car = relationship("Car")
