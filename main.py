@@ -34,31 +34,53 @@ if "autenticador" not in st.session_state:
 # emails of users that are allowed to login
 allowed_users = os.getenv("ALLOWED_USERS").split(",")
 
-st.title("Instituto Minerva Playground")
-if not st.session_state["connected"]:
-    st.write("Acesse com o Google para continuar")
-
 authenticator = Authenticator(
-    allowed_users=allowed_users,
-    token_key=os.getenv("TOKEN_KEY"),
-    secret_path="client_secret.json",
-    redirect_uri="http://localhost:8501",
-)
+                allowed_users=allowed_users,
+                token_key=os.getenv("TOKEN_KEY"),
+                secret_path="client_secret.json",
+                redirect_uri="http://localhost:8501",
+            )
 
-authenticator.check_auth()
-authenticator.login()
+#-------------------------------------------------------
+
+# Creating a layout with columns to position the button in the top right corner
+col1, col2 = st.columns([8, 2]) 
+
+# Left part (Title)
+with col1:
+    st.title("Tabela FIPE")
+
+# Right part (Login)
+with col2:
+    st.markdown("<div style='text-align: right;'>", unsafe_allow_html=True)
+    if not st.session_state["connected"]:   
+        authenticator.check_auth()
+        authenticator.login()
+            
+    else:
+        email = st.session_state['user_info']['email']
+        username = email.split("@")[0] 
+        st.write(f"{username}")
+        
+        if st.button("Logout"):
+            authenticator.logout()
+            st.session_state["connected"] = False
+            st.session_state["user_info"] = None
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+#-------------------------------------------------------
 
 # show content that requires login
 if st.session_state["connected"]:
-    st.write(f"Bem vindo! {st.session_state['user_info'].get('email')}")
-    home, logout = st.columns(2)
-    with home:
+    gestor, pesquisador = st.columns(2)
+    with gestor:
         if st.button("Gestor", use_container_width=True):
-            st.switch_page("pages/home.py")
-    with logout:
-        if st.button("Log out", use_container_width=True):
-            authenticator.logout()
+            st.switch_page("pages/gestor.py")
+    with pesquisador:
+        if st.button("Pesquisador", use_container_width=True):
+            st.switch_page("pages/pesquisador.py")
 
 if authenticator.valido == False:
-    st.write(f"Escolha um email autenticado! Caso seu email não seja válido, entre em contato com o administrador.")
+    st.write(f"Email inválido, entre em contato com o administrador.")
 
