@@ -14,12 +14,12 @@ class UserRolePostgresqlRepository():
             self, db_row: UserRoleDBModel
     ) -> Optional[UserRole]:
         return UserRole(
-            id=str(db_row.id),
-            user_id=str(db_row.user_id),
-            role_id=str(db_row.role_id)
+            id=db_row.id,
+            user_id=db_row.user_id,
+            role_id=db_row.role_id
         )
 
-    def create(self, user_id: str, role_id: str) -> Optional[UserRole]:
+    def create(self, user_id: uuid.UUID, role_id: uuid.UUID) -> Optional[UserRole]:
         """ Create user role
         :param user_id: str
         :param role_id: str
@@ -28,8 +28,8 @@ class UserRolePostgresqlRepository():
         user_role_id = uuid.uuid4()
         user_role_db_model = UserRoleDBModel(
             id=user_role_id,
-            user_id=uuid.UUID(user_id),
-            role_id=uuid.UUID(role_id)
+            user_id=user_id,
+            role_id=role_id
         )
 
         try:
@@ -43,7 +43,7 @@ class UserRolePostgresqlRepository():
             return self.__db_to_entity(user_role_db_model)
         return None
 
-    def get(self, user_role_id: str) -> Optional[UserRole]:
+    def get(self, user_role_id: uuid.UUID) -> Optional[UserRole]:
         """ Get user role by id
         :param user_role_id: userRoleId
         :return: Optional[user_role]
@@ -59,18 +59,18 @@ class UserRolePostgresqlRepository():
         :return: Optional[user_role]
         """
         user_role_db_model = UserRoleDBModel(
-            id=uuid.UUID(user_role.id),
-            user_id=uuid.UUID(user_role.user_id),
-            role_id=uuid.UUID(user_role.role_id)
+            id=user_role.id,
+            user_id=user_role.user_id,
+            role_id=user_role.role_id
         )
         result = self.session.query(
             UserRoleDBModel
         ).filter_by(
-            id=uuid.UUID(user_role.id)
+            id=user_role.id
         ).update(
             {
-                "user_id": uuid.UUID(user_role.user_id),
-                "role_id": uuid.UUID(user_role.role_id)
+                "user_id": user_role.user_id,
+                "role_id": user_role.role_id
             }
         )
         if result == 0:

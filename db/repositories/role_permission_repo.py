@@ -15,12 +15,12 @@ class RolePermissionPostgresqlRepository():
             self, db_row: RolePermissionDBModel
     ) -> Optional[RolePermission]:
         return RolePermission(
-            id=str(db_row.id),
-            role_id=str(db_row.role_id),
-            permission_id=str(db_row.permission_id)
+            id=db_row.id,
+            role_id=db_row.role_id,
+            permission_id=db_row.permission_id
         )
 
-    def create(self, role_id: str, permission_id: str) -> Optional[RolePermission]:
+    def create(self, role_id: uuid.UUID, permission_id: uuid.UUID) -> Optional[RolePermission]:
         """ Create role permission
         :param role_id: str
         :param permission_id: str
@@ -29,8 +29,8 @@ class RolePermissionPostgresqlRepository():
         role_permission_id = uuid.uuid4()
         role_permission_db_model = RolePermissionDBModel(
             id=role_permission_id,
-            role_id=uuid.UUID(role_id),
-            permission_id=uuid.UUID(permission_id)
+            role_id=role_id,
+            permission_id=permission_id
         )
 
         try:
@@ -60,18 +60,18 @@ class RolePermissionPostgresqlRepository():
         :return: Optional[role_permission]
         """
         role_permission_db_model = RolePermissionDBModel(
-            id=uuid.UUID(role_permission.id),
-            role_id=uuid.UUID(role_permission.role_id),
-            permission_id=uuid.UUID(role_permission.permission_id)
+            id=role_permission.id,
+            role_id=role_permission.role_id,
+            permission_id=role_permission.permission_id
         )
         result = self.session.query(
             RolePermissionDBModel
         ).filter_by(
-            id=uuid.UUID(role_permission.id)
+            id=role_permission.id
         ).update(
             {
-                "role_id": uuid.UUID(role_permission.role_id),
-                "permission_id": uuid.UUID(role_permission.permission_id)
+                "role_id": role_permission.role_id,
+                "permission_id": role_permission.permission_id
             }
         )
         if result == 0:

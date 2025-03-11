@@ -23,7 +23,7 @@ class PermissionPostgresqlRepository():
         """
         permission_id = uuid.uuid4()
         permission_db_model = PermissionDBModel(
-            id=str(permission_id),
+            id=uuid.UUID(permission_id),
             name=name
         )
 
@@ -38,7 +38,7 @@ class PermissionPostgresqlRepository():
             return self.__db_to_entity(permission_db_model)
         return None
 
-    def get(self, permission_id: str) -> Optional[Permission]:
+    def get(self, permission_id: uuid.UUID) -> Optional[Permission]:
         """ Get permission by id
         :param permission_id: permissionId
         :return: Optional[permission]

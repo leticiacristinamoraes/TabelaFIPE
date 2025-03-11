@@ -27,7 +27,7 @@ class AvgPricePostgresqlRepository():
         """
         avg_price_id = uuid.uuid4()
         avg_price_db_model = AvgPriceDBModel(
-            id=str(avg_price_id),
+            id=avg_price_id,
             car_id=car_id,
             avg_price=avg_price
         )

@@ -27,7 +27,7 @@ class CarPostgresqlRepository():
         """
         car_id = uuid.uuid4()
         car_db_model = CarDBModel(
-            id=str(car_id),
+            id=car_id,
             brand=brand,
             model=model,
             model_year=model_year
@@ -44,7 +44,7 @@ class CarPostgresqlRepository():
             return self.__db_to_entity(car_db_model)
         return None
 
-    def get(self, car_id: str) -> Optional[Car]:
+    def get(self, car_id: uuid.UUID) -> Optional[Car]:
         """ Get car by id
         :param car_id: carId
         :return: Optional[car]

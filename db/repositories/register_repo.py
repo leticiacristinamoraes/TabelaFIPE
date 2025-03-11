@@ -13,20 +13,20 @@ class RegisterPostgresqlRepository():
             self, db_row: RegisterDBModel
     ) -> Optional[Register]:
         return Register(
-            id=str(db_row.id),
-            car_id=str(db_row.car_id),
-            shop_id=str(db_row.shop_id),
-            price=str(db_row.price),
+            id=db_row.id,
+            car_id=db_row.car_id,
+            shop_id=db_row.shop_id,
+            price=db_row.price,
             created_date=db_row.created_date
         )
 
-    def create(self, car_id: str, shop_id: str, price:str, created_date: datetime.datetime) -> Optional[Register]:
+    def create(self, car_id: uuid.UUID, shop_id: uuid.UUID, price:str, created_date: datetime.datetime) -> Optional[Register]:
 
         register_id = uuid.uuid4()
         register_db_model = RegisterDBModel(
             id=register_id,
-            car_id=uuid.UUID(car_id),
-            shop_id=uuid.UUID(shop_id),
+            car_id=car_id,
+            shop_id=shop_id,
             price=price,
             created_date=created_date
         )
@@ -42,7 +42,7 @@ class RegisterPostgresqlRepository():
             return self.__db_to_entity(register_db_model)
         return None
 
-    def get(self, register_id: str) -> Optional[Register]:
+    def get(self, register_id: uuid.UUID) -> Optional[Register]:
         """ Get register by id
         :param register_id: registerId
         :return: Optional[register]
@@ -58,9 +58,9 @@ class RegisterPostgresqlRepository():
         :return: Optional[register]
         """
         register_db_model = RegisterDBModel(
-            id=uuid.UUID(register.id),
-            car_id=uuid.UUID(register.car_id),
-            shop_id=uuid.UUID(register.shop_id),
+            id=register.id,
+            car_id=register.car_id,
+            shop_id=register.shop_id,
             price=str(register.price),
             created_date=register.created_date
         )

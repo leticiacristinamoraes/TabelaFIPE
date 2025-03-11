@@ -5,11 +5,6 @@ from dataclasses import dataclass, asdict
 from app.entities.shop import Shop
 from typing import Optional
 
-@dataclass
-class Shop:
-    id: str
-    name: str
-
 class ShopPostgresqlRepository():
     def __init__(self, session: Session) -> None:
         self.session = session
@@ -18,7 +13,7 @@ class ShopPostgresqlRepository():
             self, db_row: ShopDBModel
     ) -> Optional[Shop]:
         return Shop(
-            id=str(db_row.id),
+            id=db_row.id,
             name=db_row.name
         )
 
