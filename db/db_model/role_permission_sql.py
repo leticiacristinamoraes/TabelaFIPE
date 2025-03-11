@@ -7,8 +7,8 @@ Base = declarative_base()
 class RolePermissionDBModel(Base):
     __tablename__ = 'Roles_permissions'
     id = Column(uuid.UUID, primary_key=True)
-    role_id = Column(uuid.UUID, ForeignKey('Permission.id'))
+    role_id = Column(uuid.UUID, ForeignKey('Permissions.id'))
     permission_id = Column(uuid.UUID, ForeignKey('Roles.id'))
     role = relationship("Roles")
-    permission = relationship("Permission")
+    permission = relationship("Permissions")
     
