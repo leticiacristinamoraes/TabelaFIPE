@@ -2,13 +2,12 @@ import uuid
 
 from sqlalchemy import select
 from db.db_model.role_sql import RoleDBModel
-from db_model.db_base_postgresql import Session
 from app.entities.role import Role
 from typing import Optional
 
 class RolePostgresqlRepository():
-    def __init__(self) -> None:
-        self.__session = Session
+    def __init__(self, session) -> None:
+        self.__session = session
 
     def __db_to_entity(
             self, db_row: RoleDBModel

@@ -2,14 +2,14 @@ import uuid
 
 from sqlalchemy import select
 from db.db_model.register_sql import RegisterDBModel
-from db_model.db_base_postgresql import Session
+
 from app.entities.register import Register
 from typing import Optional
 import datetime
 
 class RegisterPostgresqlRepository():
-    def __init__(self) -> None:
-        self.__session = Session
+    def __init__(self, session) -> None:
+        self.__session = session
 
     def __db_to_entity(
             self, db_row: RegisterDBModel
@@ -22,7 +22,7 @@ class RegisterPostgresqlRepository():
             created_date=db_row.created_date
         )
 
-    def create(self, car_id: uuid.UUID, shop_id: uuid.UUID, price:str, created_date: datetime.datetime) -> Optional[Register]:
+    def create(self, car_id: uuid.UUID, shop_id: uuid.UUID, price:str) -> Optional[Register]:
 
         register_id = uuid.uuid4()
         register_db_model = RegisterDBModel(
@@ -30,7 +30,6 @@ class RegisterPostgresqlRepository():
             car_id=car_id,
             shop_id=shop_id,
             price=price,
-            created_date=created_date
         )
 
         try:

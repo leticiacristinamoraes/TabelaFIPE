@@ -2,13 +2,12 @@ import uuid
 
 from sqlalchemy import select
 from db.db_model.car_sql import CarDBModel
-from db_model.db_base_postgresql import Session
 from app.entities.car import Car
 from typing import Optional
 
 class CarPostgresqlRepository():
-    def __init__(self) -> None:
-        self.session = Session
+    def __init__(self, session) -> None:
+        self.session = session
 
     def __db_to_entity(
             self, db_row: CarDBModel

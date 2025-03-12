@@ -2,7 +2,6 @@ import uuid
 
 from sqlalchemy import select
 from db.db_model.role_permission_sql import RolePermissionDBModel
-from db_model.db_base_postgresql import Session
 from app.entities.role_permission import RolePermission
 from dataclasses import dataclass, asdict
 from typing import Optional
@@ -10,8 +9,8 @@ from typing import Optional
 
 
 class RolePermissionPostgresqlRepository():
-    def __init__(self) -> None:
-        self.__session = Session
+    def __init__(self, session) -> None:
+        self.__session = session
 
     def __db_to_entity(
             self, db_row: RolePermissionDBModel
