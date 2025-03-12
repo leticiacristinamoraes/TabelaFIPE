@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import requests
-from authu import check_password, login_button
+
 from data import initialize_data
 from fipe_api import get_brands, get_models, get_years, get_vehicle_price
 
@@ -92,17 +92,25 @@ st.markdown("</div>", unsafe_allow_html=True)
 
 # show content that requires login
 if st.session_state["connected"]:
+    email= st.session_state['user_info']['email'] 
+   
+   #
     gestor, pesquisador = st.columns(2)
     with gestor:
+         # if email['role']== 'gestor':
         if st.button("Gestor", use_container_width=True):
               st.session_state.user_role = 'manager'
               st.switch_page("pages/Manager.py")                    
               st.write("👨‍💼 [Gestor Acelera Sao Paulo](Manager.py)")
+            
     with pesquisador:
+        #if email['role']== 'pesquisador'  
         if st.button("Pesquisador", use_container_width=True):
                st.session_state.user_role = 'researcher'
                st.write("🔍 [Pesquisador](Researcher.py)")
                st.switch_page("pages/Researcher.py")
+    #else    
+     #   st.write(f"Email inválido, entre em contato com o administrador.")        
 
 if authenticator.valido == False:
     st.write(f"Email inválido, entre em contato com o administrador.")
