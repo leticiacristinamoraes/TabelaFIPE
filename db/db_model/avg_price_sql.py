@@ -1,9 +1,9 @@
 import uuid
-from sqlalchemy import create_engine, Column, String, Integer, ForeignKey, Float, Date
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy import Column, ForeignKey, String
+from sqlalchemy.orm import relationship
+from db.db_model.db_base_postgresql import Base
 
-Base = declarative_base()
+
 class AvgPriceDBModel(Base):
     __tablename__ = 'Avg_price'
     id = Column(uuid.UUID, primary_key=True)

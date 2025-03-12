@@ -1,8 +1,7 @@
 import uuid
-from sqlalchemy import create_engine, Column, String, Integer, ForeignKey, Float, Date
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
-Base = declarative_base()
+from sqlalchemy import Column, Date, ForeignKey, String
+from sqlalchemy.orm import relationship
+from db.db_model.db_base_postgresql import Base
 
 class RegisterDBModel(Base):
     __tablename__ = 'Registers'

@@ -1,12 +1,14 @@
 import uuid
-from TabelaFIPE.db.db_model.role_sql import RoleDBModel
+
+from sqlalchemy import select
+from db.db_model.role_sql import RoleDBModel
 from db_model.db_base_postgresql import Session
 from app.entities.role import Role
 from typing import Optional
 
 class RolePostgresqlRepository():
-    def __init__(self, session: Session) -> None:
-        self.session = session
+    def __init__(self) -> None:
+        self.__session = Session
 
     def __db_to_entity(
             self, db_row: RoleDBModel
@@ -28,9 +30,9 @@ class RolePostgresqlRepository():
         )
 
         try:
-            self.session.add(role_db_model)
-            self.session.commit()
-            self.session.refresh(role_db_model)
+            self.__session.add(role_db_model)
+            self.__session.commit()
+            self.__session.refresh(role_db_model)
         except:
             print("error")
 
@@ -38,12 +40,12 @@ class RolePostgresqlRepository():
             return self.__db_to_entity(role_db_model)
         return None
 
-    def get(self, role_id: str) -> Optional[Role]:
+    def get(self, role_id: uuid.UUID) -> Optional[Role]:
         """ Get role by id
         :param role_id: roleId
         :return: Optional[role]
         """
-        result = self.session.query(RoleDBModel).get(uuid.UUID(role_id))
+        result = self.__session.execute(select(RoleDBModel).where(RoleDBModel.id == role_id)).fetchone()[0]
         if result is not None:
             return self.__db_to_entity(result)
         return None
@@ -57,7 +59,7 @@ class RolePostgresqlRepository():
             id=uuid.UUID(role.id),
             name=role.name
         )
-        result = self.session.query(
+        result = self.__session.query(
             RoleDBModel
         ).filter_by(
             id=uuid.UUID(role.id)
@@ -68,5 +70,5 @@ class RolePostgresqlRepository():
         )
         if result == 0:
             return None
-        self.session.commit()
+        self.__session.commit()
         return self.__db_to_entity(role_db_model)

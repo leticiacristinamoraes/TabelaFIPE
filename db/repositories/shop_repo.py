@@ -1,13 +1,15 @@
 import uuid
-from TabelaFIPE.db.db_model.shop_sql import ShopDBModel
+
+from sqlalchemy import select
+from db.db_model.shop_sql import ShopDBModel
 from db_model.db_base_postgresql import Session
 from dataclasses import dataclass, asdict
 from app.entities.shop import Shop
 from typing import Optional
 
 class ShopPostgresqlRepository():
-    def __init__(self, session: Session) -> None:
-        self.session = session
+    def __init__(self) -> None:
+        self.__session = Session
 
     def __db_to_entity(
             self, db_row: ShopDBModel
@@ -29,9 +31,9 @@ class ShopPostgresqlRepository():
         )
 
         try:
-            self.session.add(shop_db_model)
-            self.session.commit()
-            self.session.refresh(shop_db_model)
+            self.__session.add(shop_db_model)
+            self.__session.commit()
+            self.__session.refresh(shop_db_model)
         except:
             print("error")
 
@@ -39,12 +41,12 @@ class ShopPostgresqlRepository():
             return self.__db_to_entity(shop_db_model)
         return None
 
-    def get(self, shop_id: str) -> Optional[Shop]:
+    def get(self, shop_id: uuid.UUID) -> Optional[Shop]:
         """ Get shop by id
         :param shop_id: shopId
         :return: Optional[shop]
         """
-        result = self.session.query(ShopDBModel).get(uuid.UUID(shop_id))
+        result = self.__session.execute(select(ShopDBModel).where(ShopDBModel.id == shop_id)).fetchone()[0]
         if result is not None:
             return self.__db_to_entity(result)
         return None
@@ -58,7 +60,7 @@ class ShopPostgresqlRepository():
             id=uuid.UUID(shop.id),
             name=shop.name
         )
-        result = self.session.query(
+        result = self.__session.query(
             ShopDBModel
         ).filter_by(
             id=uuid.UUID(shop.id)
@@ -69,5 +71,5 @@ class ShopPostgresqlRepository():
         )
         if result == 0:
             return None
-        self.session.commit()
+        self.__session.commit()
         return self.__db_to_entity(shop_db_model)

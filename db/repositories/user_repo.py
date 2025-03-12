@@ -1,12 +1,15 @@
+import logging
 import uuid
-from TabelaFIPE.db.db_model.user_sql import UserDBModel
-from db_model.db_base_postgresql import Session
+
+from sqlalchemy.exc import OperationalError
+from db.db_model.user_sql import UserDBModel
 from app.entities.user import User
 from typing import Optional
+from sqlalchemy import select, UUID
 
 class UserPostgresqlRepository():
-    def __init__(self, session: Session) -> None:
-        self.session = session
+    def __init__(self, session) -> None:
+        self.__session = session
 
     def __db_to_entity(
             self, db_row: UserDBModel
@@ -25,32 +28,45 @@ class UserPostgresqlRepository():
         """
         user_id = uuid.uuid4()
         user_db_model = UserDBModel(
-            user_id=user_id,
+            id=user_id,
             name=name,
             email=email
         )
-
+        print(user_db_model)
         try:
             self.__session.add(user_db_model)
             self.__session.commit()
             self.__session.refresh(user_db_model)
-        except:
-            print("erro")
+        except OperationalError as err:
+            logging.error("create %s", err)
 
         if user_db_model is not None:
             return self.__db_to_entity(user_db_model)
         return None
 
-    def get(self, user_id: str) -> Optional[UserDBModel]:
+    def get(self, user_email: str) -> Optional[UserDBModel]:
         """ Get user by id
         :param user_id: userId
         :return: Optional[user]
         """
-        result = self.__session.query(UserDBModel).get(user_id)
+        result = self.__session.execute(select(UserDBModel).where(UserDBModel.email == user_email)).fetchone()[0]
+        print(result)
         if result is not None:
             return self.__db_to_entity(result)
         return None
-
+    def get_all(self) -> Optional[UserDBModel]:
+        """ Get user by id
+        :param user_id: userId
+        :return: Optional[user]
+        """
+        try:
+            result = self.__session.execute(select(UserDBModel))
+            for row in result:
+                print(self.__db_to_entity(row))
+            if result is not None:
+                return result
+        except OperationalError as err:
+            logging.error("get all %s", err)
     def update(self, user: User) -> Optional[User]:
         """ Update user
         :param user: user

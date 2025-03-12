@@ -1,20 +1,26 @@
 services:
   tabelafipe:
-    build: .
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    depends_on:
+      - db
+    container_name: tabelafipe
+    
     ports:
       - "8501:8501"
     volumes:
-      - "./static:/tabelafipe/app/static/"
+      - ./static:/tabelafipe/app/static/
   db:
     image: postgres
-    container_name: "app_db"
-    restart: always
+    container_name: db
+    restart: unless-stopped
     environment:
-      POSTGRES_PASSWORD: ''
-      POSTGRES_USER: ''
-      POSTGRES_DB: ''
-      TZ: 
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: testDB
     volumes:
-      - "./data/postgress:/var/lib/postgresql/data/"
-    ports:
-      - "5432:5432"
+      - ./pg-data:/var/lib/postgresql/data
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    expose:
+      - "5432"

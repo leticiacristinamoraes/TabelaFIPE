@@ -1,5 +1,7 @@
 import uuid
-from TabelaFIPE.db.db_model.avg_price_sql import AvgPriceDBModel
+
+from sqlalchemy import select
+from db.db_model.avg_price_sql import AvgPriceDBModel
 from db_model.db_base_postgresql import Session
 from app.entities.avg_price import AvgPrice
 from dataclasses import dataclass, asdict
@@ -7,8 +9,8 @@ from typing import Optional
 
 
 class AvgPricePostgresqlRepository():
-    def __init__(self, session: Session) -> None:
-        self.session = session
+    def __init__(self) -> None:
+        self.__session = Session
 
     def __db_to_entity(
             self, db_row: AvgPriceDBModel
@@ -19,7 +21,7 @@ class AvgPricePostgresqlRepository():
             avg_price=db_row.avg_price
         )
 
-    def create(self, car_id: str, avg_price: str) -> Optional[AvgPrice]:
+    def create(self, car_id: uuid.UUID, avg_price: str) -> Optional[AvgPrice]:
         """ Create avg price
         :param car_id: str
         :param avg_price: str
@@ -33,9 +35,9 @@ class AvgPricePostgresqlRepository():
         )
 
         try:
-            self.session.add(avg_price_db_model)
-            self.session.commit()
-            self.session.refresh(avg_price_db_model)
+            self.__session.add(avg_price_db_model)
+            self.__session.commit()
+            self.__session.refresh(avg_price_db_model)
         except:
             print("error")
 
@@ -43,12 +45,12 @@ class AvgPricePostgresqlRepository():
             return self.__db_to_entity(avg_price_db_model)
         return None
 
-    def get(self, avg_price_id: str) -> Optional[AvgPrice]:
+    def get(self, avg_price_id: uuid.UUID) -> Optional[AvgPrice]:
         """ Get avg price by id
         :param avg_price_id: avgPriceId
         :return: Optional[avg_price]
         """
-        result = self.session.query(AvgPriceDBModel).get(avg_price_id)
+        result = self.__session.execute(select(AvgPriceDBModel).where(AvgPriceDBModel.id ==avg_price_id)).fetchone()[0]
         if result is not None:
             return self.__db_to_entity(result)
         return None
@@ -63,7 +65,7 @@ class AvgPricePostgresqlRepository():
             car_id=avg_price.car_id,
             avg_price=avg_price.avg_price
         )
-        result = self.session.query(
+        result = self.__session.query(
             AvgPriceDBModel
         ).filter_by(
             id=avg_price.id
@@ -75,5 +77,5 @@ class AvgPricePostgresqlRepository():
         )
         if result == 0:
             return None
-        self.session.commit()
+        self.__session.commit()
         return self.__db_to_entity(avg_price_db_model)

@@ -1,12 +1,14 @@
 import uuid
-from TabelaFIPE.db.db_model.permission_sql import PermissionDBModel
+
+from sqlalchemy import select
+from db.db_model.permission_sql import PermissionDBModel
 from db_model.db_base_postgresql import Session
 from app.entities.permission import Permission
 from typing import Optional
 
 class PermissionPostgresqlRepository():
-    def __init__(self, session: Session) -> None:
-        self.session = session
+    def __init__(self) -> None:
+        self.__session = Session
 
     def __db_to_entity(
             self, db_row: PermissionDBModel
@@ -28,9 +30,9 @@ class PermissionPostgresqlRepository():
         )
 
         try:
-            self.session.add(permission_db_model)
-            self.session.commit()
-            self.session.refresh(permission_db_model)
+            self.__session.add(permission_db_model)
+            self.__session.commit()
+            self.__session.refresh(permission_db_model)
         except:
             print("error")
 
@@ -43,7 +45,7 @@ class PermissionPostgresqlRepository():
         :param permission_id: permissionId
         :return: Optional[permission]
         """
-        result = self.session.query(PermissionDBModel).get(permission_id)
+        result = self.__session.execute(select(PermissionDBModel).where(PermissionDBModel.id == permission_id)).fetchone()[0]
         if result is not None:
             return self.__db_to_entity(result)
         return None
@@ -57,7 +59,7 @@ class PermissionPostgresqlRepository():
             id=permission.id,
             name=permission.name
         )
-        result = self.session.query(
+        result = self.__session.query(
             PermissionDBModel
         ).filter_by(
             id=permission.id
@@ -68,5 +70,5 @@ class PermissionPostgresqlRepository():
         )
         if result == 0:
             return None
-        self.session.commit()
+        self.__session.commit()
         return self.__db_to_entity(permission_db_model)

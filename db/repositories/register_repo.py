@@ -1,13 +1,15 @@
 import uuid
-from TabelaFIPE.db.db_model.register_sql import RegisterDBModel
+
+from sqlalchemy import select
+from db.db_model.register_sql import RegisterDBModel
 from db_model.db_base_postgresql import Session
 from app.entities.register import Register
 from typing import Optional
 import datetime
 
 class RegisterPostgresqlRepository():
-    def __init__(self, session: Session) -> None:
-        self.session = session
+    def __init__(self) -> None:
+        self.__session = Session
 
     def __db_to_entity(
             self, db_row: RegisterDBModel
@@ -32,9 +34,9 @@ class RegisterPostgresqlRepository():
         )
 
         try:
-            self.session.add(register_db_model)
-            self.session.commit()
-            self.session.refresh(register_db_model)
+            self.__session.add(register_db_model)
+            self.__session.commit()
+            self.__session.refresh(register_db_model)
         except:
             print("error")
 
@@ -47,7 +49,7 @@ class RegisterPostgresqlRepository():
         :param register_id: registerId
         :return: Optional[register]
         """
-        result = self.session.query(RegisterDBModel).get(uuid.UUID(register_id))
+        result = self.__session.execute(select(RegisterDBModel).where(RegisterDBModel.id == register_id)).fetchone()[0]
         if result is not None:
             return self.__db_to_entity(result)
         return None
@@ -64,7 +66,7 @@ class RegisterPostgresqlRepository():
             price=str(register.price),
             created_date=register.created_date
         )
-        result = self.session.query(
+        result = self.__session.query(
             RegisterDBModel
         ).filter_by(
             id=uuid.UUID(register.id)
@@ -78,5 +80,5 @@ class RegisterPostgresqlRepository():
         )
         if result == 0:
             return None
-        self.session.commit()
+        self.__session.commit()
         return self.__db_to_entity(register_db_model)

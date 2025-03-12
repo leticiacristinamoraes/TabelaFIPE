@@ -1,5 +1,7 @@
 import uuid
-from TabelaFIPE.db.db_model.role_permission_sql import RolePermissionDBModel
+
+from sqlalchemy import select
+from db.db_model.role_permission_sql import RolePermissionDBModel
 from db_model.db_base_postgresql import Session
 from app.entities.role_permission import RolePermission
 from dataclasses import dataclass, asdict
@@ -8,8 +10,8 @@ from typing import Optional
 
 
 class RolePermissionPostgresqlRepository():
-    def __init__(self, session: Session) -> None:
-        self.session = session
+    def __init__(self) -> None:
+        self.__session = Session
 
     def __db_to_entity(
             self, db_row: RolePermissionDBModel
@@ -34,9 +36,9 @@ class RolePermissionPostgresqlRepository():
         )
 
         try:
-            self.session.add(role_permission_db_model)
-            self.session.commit()
-            self.session.refresh(role_permission_db_model)
+            self.__session.add(role_permission_db_model)
+            self.__session.commit()
+            self.__session.refresh(role_permission_db_model)
         except:
             print("error")
 
@@ -49,7 +51,7 @@ class RolePermissionPostgresqlRepository():
         :param role_permission_id: rolePermissionId
         :return: Optional[role_permission]
         """
-        result = self.session.query(RolePermissionDBModel).get(uuid.UUID(role_permission_id))
+        result = self.__session.execute(select(RolePermissionDBModel).where(RolePermissionDBModel.id == role_permission_id)).fetchone()[0]
         if result is not None:
             return self.__db_to_entity(result)
         return None
@@ -64,7 +66,7 @@ class RolePermissionPostgresqlRepository():
             role_id=role_permission.role_id,
             permission_id=role_permission.permission_id
         )
-        result = self.session.query(
+        result = self.__session.query(
             RolePermissionDBModel
         ).filter_by(
             id=role_permission.id
@@ -76,5 +78,5 @@ class RolePermissionPostgresqlRepository():
         )
         if result == 0:
             return None
-        self.session.commit()
+        self.__session.commit()
         return self.__db_to_entity(role_permission_db_model)
