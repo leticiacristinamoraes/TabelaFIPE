@@ -1,10 +1,9 @@
 import uuid
-from sqlalchemy import create_engine, Column, String, Integer, ForeignKey, Float, Date
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, String
+from db.db_model.db_base_postgresql import Base
 
-Base = declarative_base()
 class CarDBModel(Base):
-    __tablename__ = 'cars'
+    __tablename__ = 'Cars'
     id = Column(uuid.UUID, primary_key=True)
     brand = Column(String)
     model = Column(String)

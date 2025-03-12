@@ -1,4 +1,6 @@
 import uuid
+
+from sqlalchemy import select
 from TabelaFIPE.db.db_model.user_role_sql import UserRoleDBModel
 from app.entities.user_role import UserRole
 from db_model.db_base_postgresql import Session
@@ -7,8 +9,8 @@ from typing import Optional
 
 
 class UserRolePostgresqlRepository():
-    def __init__(self, session: Session) -> None:
-        self.session = session
+    def __init__(self) -> None:
+        self.__session = Session
 
     def __db_to_entity(
             self, db_row: UserRoleDBModel
@@ -33,9 +35,9 @@ class UserRolePostgresqlRepository():
         )
 
         try:
-            self.session.add(user_role_db_model)
-            self.session.commit()
-            self.session.refresh(user_role_db_model)
+            self.__session.add(user_role_db_model)
+            self.__session.commit()
+            self.__session.refresh(user_role_db_model)
         except:
             print("error")
 
@@ -48,7 +50,7 @@ class UserRolePostgresqlRepository():
         :param user_role_id: userRoleId
         :return: Optional[user_role]
         """
-        result = self.session.query(UserRoleDBModel).get(uuid.UUID(user_role_id))
+        result = self.__session.execute(select(UserRoleDBModel)).where(UserRoleDBModel.email == user_role_id).fetchone()[0]
         if result is not None:
             return self.__db_to_entity(result)
         return None
@@ -63,7 +65,7 @@ class UserRolePostgresqlRepository():
             user_id=user_role.user_id,
             role_id=user_role.role_id
         )
-        result = self.session.query(
+        result = self.__session.query(
             UserRoleDBModel
         ).filter_by(
             id=user_role.id
@@ -75,5 +77,5 @@ class UserRolePostgresqlRepository():
         )
         if result == 0:
             return None
-        self.session.commit()
+        self.__session.commit()
         return self.__db_to_entity(user_role_db_model)

@@ -1,12 +1,14 @@
 import uuid
-from TabelaFIPE.db.db_model.car_sql import CarDBModel
+
+from sqlalchemy import select
+from db.db_model.car_sql import CarDBModel
 from db_model.db_base_postgresql import Session
 from app.entities.car import Car
 from typing import Optional
 
 class CarPostgresqlRepository():
-    def __init__(self, session: Session) -> None:
-        self.session = session
+    def __init__(self) -> None:
+        self.session = Session
 
     def __db_to_entity(
             self, db_row: CarDBModel
@@ -49,7 +51,7 @@ class CarPostgresqlRepository():
         :param car_id: carId
         :return: Optional[car]
         """
-        result = self.session.query(CarDBModel).get(car_id)
+        result = self.__session.execute(select(CarDBModel).where(CarDBModel.id == car_id)).fetchone()[0]
         if result is not None:
             return self.__db_to_entity(result)
         return None

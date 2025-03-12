@@ -5,5 +5,8 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "psycopg-binary>=3.2.5",
+    "psycopg[binary]>=3.2.5",
+    "sqlalchemy[asyncio]>=2.0.39",
     "streamlit>=1.43.1",
 ]

@@ -1,10 +1,12 @@
 import uuid
-from sqlalchemy import create_engine, Column, String, Integer, ForeignKey, Float, Date
-from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base()
+from sqlalchemy import String
+from db.db_model.db_base_postgresql import Base
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.dialects.postgresql import UUID
 class UserDBModel(Base):
     __tablename__ = 'Users'
-    id = Column(uuid.UUID, primary_key=True)
-    name = Column(String)
-    email = Column(String)
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name: Mapped[String] = mapped_column(String)
+    email: Mapped[String] = mapped_column(String)
+
+
