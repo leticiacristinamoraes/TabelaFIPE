@@ -7,7 +7,7 @@ import sys
 import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from services.user_register import insert_user
+
 
 
 class AuthTokenManager:
@@ -35,7 +35,7 @@ class AuthTokenManager:
       datetime.now() + timedelta(days=self.token_duration_days)
     ).timestamp()
     token = self._encode_token(email, oauth_id, exp_date)
-    insert_user(oauth_id, email)
+
     self.cookie_manager.set(
       self.cookie_name,
       token,

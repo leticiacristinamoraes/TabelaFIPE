@@ -12,46 +12,51 @@ from lib.data import get_researchers, get_stores
 st.set_page_config(
     page_title="Gestor",
     page_icon="👨‍💼",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
+st.markdown("""
+    <style>
+        [data-testid="stSidebarNav"] {display: none;}
+    </style>
+""", unsafe_allow_html=True)
 
-
-check_authentication(required_role="manager")
+#check_authentication(required_role="manager")
 
 
 st.title("👨‍💼 Pagina do Gestor")
 st.write("Bem vindo a pagina, acesse a lista de pesquisadores, lojas e gerencie usuarios")
 
 
-with st.sidebar:
-    st.title("🚗 FIPE")
-    st.success(f"Logged in as Manager")
+#with st.sidebar:
+ #   st.title("🚗 FIPE")
+  #  st.success(f"Logged in as Manager")
     
-    if st.button("Logout"):
-        st.session_state.authenticated = False
-        st.session_state.user_role = None
-        st.rerun()
+  #  if st.button("Logout"):
+   #     st.session_state.authenticated = False
+   #     st.session_state.user_role = None
+   #     st.rerun()
     
     
-    st.subheader("Navigation")
-    st.write("📊 [Home Page](/)")
-    st.write("👨‍💼 [Manager Dashboard](/Manager)")
+   # st.subheader("Navigation")
+    #st.write("📊 [Home Page](/)")
+    #st.write("👨‍💼 [Manager Dashboard](/Manager)")
 
 
 tab1, tab2, tab3 = st.tabs(["Researchers", "Stores", "User Management"])
 
 with tab1:
-    st.header("Researchers")
+    st.header("Pesquisador")
     researchers_data = get_researchers()
     
     
-    with st.expander("Add New Researcher"):
+    with st.expander("Adicionar novo Pesquisador"):
         with st.form("add_researcher_form"):
-            new_name = st.text_input("Name")
+            new_name = st.text_input("Nome")
             new_email = st.text_input("Email")
-            new_phone = st.text_input("Phone")
+            new_phone = st.text_input("Telefone")
             
-            submit_button = st.form_submit_button("Add Researcher")
+            submit_button = st.form_submit_button("Adicionar novo Pesquisador")
             if submit_button and new_name and new_email:
                 
                 new_id = max([r["id"] for r in researchers_data]) + 1 if researchers_data else 1
@@ -83,9 +88,9 @@ with tab2:
     
     with st.expander("Adicionar Nova Loja"):
         with st.form("add_store_form"):
-            new_name = st.text_input("Store Name")
-            new_location = st.text_input("Location")
-            new_contact = st.text_input("Contact Info")
+            new_name = st.text_input("Nome de Loja")
+            new_location = st.text_input("Local")
+            new_contact = st.text_input("Contato")
             
             submit_button = st.form_submit_button("Add Store")
             if submit_button and new_name and new_location:
@@ -113,7 +118,7 @@ with tab2:
         st.info("No stores found. Add some using the form above.")
 
 with tab3:
-    st.header("User Management")
+    st.header("Gerenciamento de usuarios")
     
     
     users = get_all_users()
@@ -140,7 +145,7 @@ with tab3:
     
     
     if users_list:
-        st.subheader("Existing Users")
+        st.subheader("Usuarios existentes")
         users_df = pd.DataFrame(users_list)
         st.dataframe(users_df, use_container_width=True)
     
@@ -173,7 +178,7 @@ with tab3:
                     st.error(message)
     
     
-    with st.expander("Update User Role"):
+    with st.expander("Atualizar Papel do Usuario"):
         with st.form("update_role_form"):
             username_options = list(users.keys())
             selected_username = st.selectbox("Select User", options=username_options, key="role_username")
@@ -190,7 +195,7 @@ with tab3:
                     st.error(message)
     
     
-    with st.expander("Assign User to Store"):
+    with st.expander("Atribuir loja ao Pesquisador"):
         with st.form("assign_store_form"):
             
             researcher_users = [username for username, user_data in users.items() 
