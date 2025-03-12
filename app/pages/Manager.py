@@ -5,8 +5,8 @@ import os
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from auth import check_authentication, get_all_users, add_user, update_user_role, update_user_store
-from data import get_researchers, get_stores
+from lib.auth import check_authentication, get_all_users, add_user, update_user_role, update_user_store
+from lib.data import get_researchers, get_stores
 
 
 st.set_page_config(

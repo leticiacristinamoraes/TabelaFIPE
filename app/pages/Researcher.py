@@ -5,9 +5,9 @@ from datetime import datetime
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from auth import check_authentication, get_user_store_assignment
-from data import get_stores, get_evaluations
-from fipe_api import get_brands, get_models, get_years
+from lib.auth import check_authentication, get_user_store_assignment
+from lib.data import get_stores, get_evaluations
+from api.fipe_api import get_brands, get_models, get_years
 
 
 st.set_page_config(
