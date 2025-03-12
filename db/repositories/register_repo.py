@@ -1,6 +1,7 @@
 import uuid
 
 from sqlalchemy import select
+from db.db_model.car_sql import CarDBModel
 from db.db_model.register_sql import RegisterDBModel
 
 from app.entities.register import Register
@@ -52,6 +53,31 @@ class RegisterPostgresqlRepository():
         if result is not None:
             return self.__db_to_entity(result)
         return None
+    
+    def get_prices_by_car(self, car_id):
+        """ Consulta todos os preços cadastrados de um carro específico """
+        query = select(RegisterDBModel).where(RegisterDBModel.car_id == car_id)
+        result = self.__session.execute(query).fetchall()
+
+        if result:
+            return [{"id": row[0].id, "price": row[0].price, "date": row[0].created_date} for row in result]
+        return []
+
+    def get_prices_by_model(self, brand, model, model_year):
+        """ Consulta todos os preços cadastrados de um modelo específico """
+        car_query = select(CarDBModel.id).where(
+            (CarDBModel.brand == brand) & (CarDBModel.model == model)
+        )
+        car_result = self.__session.execute(car_query).fetchall()
+
+        if not car_result:
+            return []
+
+        car_ids = [row[0] for row in car_result]
+        query = select(RegisterDBModel).where(RegisterDBModel.car_id.in_(car_ids))
+        result = self.__session.execute(query).fetchall()
+
+        return [{"id": row[0].id, "price": row[0].price, "date": row[0].created_date} for row in result]
 
     def update(self, register: Register) -> Optional[Register]:
         """ Update register
@@ -81,3 +107,4 @@ class RegisterPostgresqlRepository():
             return None
         self.__session.commit()
         return self.__db_to_entity(register_db_model)
+    

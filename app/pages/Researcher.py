@@ -13,30 +13,35 @@ from api.fipe_api import get_brands, get_models, get_years
 st.set_page_config(
     page_title="Pagina de Pesquisador",
     page_icon="🔍",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
+st.markdown("""
+    <style>
+        [data-testid="stSidebarNav"] {display: none;}
+    </style>
+""", unsafe_allow_html=True)
 
-
-check_authentication(required_role="researcher")
+#check_authentication(required_role="researcher")
 
 
 st.title("🔍 Pesquisador")
 st.write("Bem vindo de volta Pesquisador. Insira os preços dos carros da loja pesquisada")
 
 
-with st.sidebar:
-    st.title("🚗 FIPE")
-    st.success(f"Logado como Pesquisador")
+#with st.sidebar:
+   # st.title("🚗 FIPE")
+   # st.success(f"Logado como Pesquisador")
     
-    if st.button("Logout"):
-        st.session_state.authenticated = False
-        st.session_state.user_role = None
-        st.rerun()
+  #  if st.button("Logout"):
+   #     st.session_state.authenticated = False
+  #      st.session_state.user_role = None
+  #      st.rerun()
     
     
-    st.subheader("Navigation")
-    st.write("📊 [Home Page](/)")
-    st.write("🔍 [Researcher Dashboard](/Researcher)")
+  #  st.subheader("Navigation")
+ #   st.write("📊 [Home Page](/)")
+ #   st.write("🔍 [Researcher Dashboard](/Researcher)")
 
 
 st.header("Insira a pesquisa")
@@ -93,9 +98,8 @@ with st.form("vehicle_evaluation_form"):
         evaluated_price = st.number_input("Preço levantado (R$)", min_value=0.0, step=100.0)
         
         
-        vehicle_condition = st.selectbox("Vehicle Condition", 
-                                        options=["Excellent", "Good", "Fair", "Poor"])
-        notes = st.text_area("Additional Notes")
+
+        #notes = st.text_area("Notas")
         
         
         submitted = st.form_submit_button("Enviar pesquisa")
@@ -113,8 +117,8 @@ with st.form("vehicle_evaluation_form"):
                     "model": selected_model_name,
                     "year": selected_year_name,
                     "evaluated_price": evaluated_price,
-                    "condition": vehicle_condition,
-                    "notes": notes,
+                    
+                    
                     "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     "researcher": st.session_state.username
                 }
@@ -128,15 +132,15 @@ with st.form("vehicle_evaluation_form"):
         st.info("Please try again or contact support.")
 
 
-st.header("Your Previous Evaluations")
-evaluations = get_evaluations()
+# st.header("Your Previous Evaluations")
+# evaluations = get_evaluations()
 
 
-if 'username' in st.session_state:
-    user_evaluations = [e for e in evaluations if e.get('researcher') == st.session_state.username]
+# if 'username' in st.session_state:
+#     user_evaluations = [e for e in evaluations if e.get('researcher') == st.session_state.username]
     
-    if user_evaluations:
-        evaluations_df = pd.DataFrame(user_evaluations)
-        st.dataframe(evaluations_df, use_container_width=True)
-    else:
-        st.info("You haven't submitted any evaluations yet.")
+#     if user_evaluations:
+#         evaluations_df = pd.DataFrame(user_evaluations)
+#         st.dataframe(evaluations_df, use_container_width=True)
+    # else:
+    #     st.info("You haven't submitted any evaluations yet.")
