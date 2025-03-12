@@ -44,12 +44,12 @@ class UserPostgresqlRepository():
             return self.__db_to_entity(user_db_model)
         return None
 
-    def get(self, user_email: str) -> Optional[UserDBModel]:
+    def get(self, user_id: uuid.UUID) -> Optional[UserDBModel]:
         """ Get user by id
         :param user_id: userId
         :return: Optional[user]
         """
-        result = self.__session.execute(select(UserDBModel).where(UserDBModel.email == user_email)).fetchone()[0]
+        result = self.__session.execute(select(UserDBModel).where(UserDBModel.id == user_id)).fetchone()[0]
         print(result)
         if result is not None:
             return self.__db_to_entity(result)
