@@ -99,7 +99,7 @@ with st.form("vehicle_evaluation_form"):
         
         
 
-        notes = st.text_area("Notas")
+        #notes = st.text_area("Notas")
         
         
         submitted = st.form_submit_button("Enviar pesquisa")
@@ -118,7 +118,7 @@ with st.form("vehicle_evaluation_form"):
                     "year": selected_year_name,
                     "evaluated_price": evaluated_price,
                     
-                    "notes": notes,
+                    
                     "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     "researcher": st.session_state.username
                 }
