@@ -1,16 +1,15 @@
 import uuid
 
 from sqlalchemy import select
-from TabelaFIPE.db.db_model.user_role_sql import UserRoleDBModel
+from db.db_model.user_role_sql import UserRoleDBModel
 from app.entities.user_role import UserRole
-from db_model.db_base_postgresql import Session
 from dataclasses import dataclass, asdict
 from typing import Optional
 
 
 class UserRolePostgresqlRepository():
-    def __init__(self) -> None:
-        self.__session = Session
+    def __init__(self, session) -> None:
+        self.__session = session
 
     def __db_to_entity(
             self, db_row: UserRoleDBModel

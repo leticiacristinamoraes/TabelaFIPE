@@ -2,14 +2,13 @@ import uuid
 
 from sqlalchemy import select
 from db.db_model.shop_sql import ShopDBModel
-from db_model.db_base_postgresql import Session
 from dataclasses import dataclass, asdict
 from app.entities.shop import Shop
 from typing import Optional
 
 class ShopPostgresqlRepository():
-    def __init__(self) -> None:
-        self.__session = Session
+    def __init__(self, session) -> None:
+        self.__session = session
 
     def __db_to_entity(
             self, db_row: ShopDBModel
