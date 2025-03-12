@@ -6,7 +6,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
-from services.token_manager import AuthTokenManager
+from lib.token_manager import AuthTokenManager
 
 class Authenticator:
     def __init__(
