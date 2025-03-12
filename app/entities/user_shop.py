@@ -1,13 +1,13 @@
 from dataclasses import dataclass, asdict
-import datetime
 import uuid
 
+
 @dataclass
-class AvgPrice:
+class UserShop:
     id: uuid.UUID
-    car_id: str
-    avg_price: str
-    
+    user_id: uuid.UUID 
+    shop_id: uuid.UUID
+
     @classmethod
     def from_dict(cls, data):
         """ Convert data from a dictionary

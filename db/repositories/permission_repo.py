@@ -5,6 +5,7 @@ from db.db_model.permission_sql import PermissionDBModel
 from app.entities.permission import Permission
 from typing import Optional
 
+# Classe de repositório de permissões para realizar CRUD com o banco de dados.
 class PermissionPostgresqlRepository():
     def __init__(self, session) -> None:
         self.__session = session
@@ -24,7 +25,7 @@ class PermissionPostgresqlRepository():
         """
         permission_id = uuid.uuid4()
         permission_db_model = PermissionDBModel(
-            id=uuid.UUID(permission_id),
+            id=permission_id,
             name=name
         )
 

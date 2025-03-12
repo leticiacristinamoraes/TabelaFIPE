@@ -7,6 +7,7 @@ from dataclasses import dataclass, asdict
 from typing import Optional
 
 
+# Classe de repositório de usuários e roles para realizar CRUD com o banco de dados.
 class UserRolePostgresqlRepository():
     def __init__(self, session) -> None:
         self.__session = session
@@ -49,7 +50,7 @@ class UserRolePostgresqlRepository():
         :param user_role_id: userRoleId
         :return: Optional[user_role]
         """
-        result = self.__session.execute(select(UserRoleDBModel)).where(UserRoleDBModel.email == user_role_id).fetchone()[0]
+        result = self.__session.execute(select(UserRoleDBModel).where(UserRoleDBModel.id == user_role_id)).fetchone()[0]
         if result is not None:
             return self.__db_to_entity(result)
         return None

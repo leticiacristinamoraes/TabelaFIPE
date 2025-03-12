@@ -5,9 +5,10 @@ from db.db_model.car_sql import CarDBModel
 from app.entities.car import Car
 from typing import Optional
 
+# Classe de repositório de cars para realizar CRUD com o banco de dados.
 class CarPostgresqlRepository():
     def __init__(self, session) -> None:
-        self.session = session
+        self.__session = session
 
     def __db_to_entity(
             self, db_row: CarDBModel
@@ -35,9 +36,9 @@ class CarPostgresqlRepository():
         )
 
         try:
-            self.session.add(car_db_model)
-            self.session.commit()
-            self.session.refresh(car_db_model)
+            self.__session.add(car_db_model)
+            self.__session.commit()
+            self.__session.refresh(car_db_model)
         except:
             print("error")
 

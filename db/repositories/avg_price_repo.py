@@ -1,15 +1,15 @@
 import uuid
 
 from sqlalchemy import func, select
-from TabelaFIPE.db.db_model.car_sql import CarDBModel
-from TabelaFIPE.db.db_model.register_sql import RegisterDBModel
+from db.db_model.car_sql import CarDBModel
+from db.db_model.register_sql import RegisterDBModel
 from db.db_model.avg_price_sql import AvgPriceDBModel
 
 from app.entities.avg_price import AvgPrice
 from dataclasses import dataclass, asdict
 from typing import Optional
 
-
+# Classe de repositório de medias de preços por carro para realizar CRUD com o banco de dados.
 class AvgPricePostgresqlRepository():
     def __init__(self, session) -> None:
         self.__session = session

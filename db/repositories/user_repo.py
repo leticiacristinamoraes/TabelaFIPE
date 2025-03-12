@@ -7,6 +7,7 @@ from app.entities.user import User
 from typing import Optional
 from sqlalchemy import select, UUID
 
+# Classe de repositório de usuários para realizar CRUD com o banco de dados.
 class UserPostgresqlRepository():
     def __init__(self, session) -> None:
         self.__session = session
