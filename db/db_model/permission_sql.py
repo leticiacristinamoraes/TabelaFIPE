@@ -1,11 +1,11 @@
 from typing import List
 import uuid
 from sqlalchemy import Column, String
-
 from db.db_model.db_base_postgresql import Base
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID
 
+#Classe relacionada a tabela Permissions no Banco de Dados
 class PermissionDBModel(Base):
     __tablename__ = 'Permissions'
 

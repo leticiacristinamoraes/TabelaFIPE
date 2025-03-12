@@ -2,11 +2,13 @@ import datetime
 from typing import List
 import uuid
 from sqlalchemy import Column, Date, DateTime, ForeignKey, String, func
-
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID
 from db.db_model.db_base_postgresql import Base
 
+#Essa classe é um objeto de mapeamento relacional (ORM) que representa a tabela Registers no Banco de Dados.
+#Por ser um objeto de mapeamento relacional, ela é diferente da classe objeto do Python.
+#Para usar a classe objeto do Python utilize a classe no app/entitites/register.py
 class RegisterDBModel(Base):
     __tablename__ = 'Registers'
     

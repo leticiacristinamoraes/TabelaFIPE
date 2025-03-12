@@ -6,6 +6,7 @@ from dataclasses import dataclass, asdict
 from app.entities.shop import Shop
 from typing import Optional
 
+# Classe de repositório de shops para realizar CRUD com o banco de dados.
 class ShopPostgresqlRepository():
     def __init__(self, session) -> None:
         self.__session = session

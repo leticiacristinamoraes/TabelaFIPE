@@ -7,7 +7,7 @@ from dataclasses import dataclass, asdict
 from typing import Optional
 
 
-
+# Classe de repositório de roles e permissions para realizar CRUD com o banco de dados.
 class RolePermissionPostgresqlRepository():
     def __init__(self, session) -> None:
         self.__session = session

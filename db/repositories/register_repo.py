@@ -8,6 +8,7 @@ from app.entities.register import Register
 from typing import Optional
 import datetime
 
+# Classe de repositório de registers para realizar CRUD com o banco de dados.
 class RegisterPostgresqlRepository():
     def __init__(self, session) -> None:
         self.__session = session
