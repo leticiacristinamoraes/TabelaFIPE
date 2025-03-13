@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from db.db_model.car_sql import CarDBModel
 from db.db_model.register_sql import RegisterDBModel
 
@@ -55,7 +55,7 @@ class RegisterPostgresqlRepository():
             return self.__db_to_entity(result)
         return None
     
-    def get_prices_by_car(self, car_id):
+    def get_prices_by_car(self, car_id:uuid.UUID):
         """ Consulta todos os preços cadastrados de um carro específico """
         query = select(RegisterDBModel).where(RegisterDBModel.car_id == car_id)
         result = self.__session.execute(query).fetchall()
@@ -80,32 +80,15 @@ class RegisterPostgresqlRepository():
 
         return [{"id": row[0].id, "price": row[0].price, "date": row[0].created_date} for row in result]
 
-    def update(self, register: Register) -> Optional[Register]:
-        """ Update register
-        :param register: register
+    def delete(self, car_id: uuid.UUID, shop_id: uuid.UUID) -> Optional[Register]:
+        """ Delete register by id
+        :param register_id: registerId
         :return: Optional[register]
         """
-        register_db_model = RegisterDBModel(
-            id=register.id,
-            car_id=register.car_id,
-            shop_id=register.shop_id,
-            price=str(register.price),
-            created_date=register.created_date
-        )
-        result = self.__session.query(
-            RegisterDBModel
-        ).filter_by(
-            id=uuid.UUID(register.id)
-        ).update(
-            {
-                "car_id": uuid.UUID(register.car_id),
-                "shop_id": uuid.UUID(register.shop_id),
-                "price": str(register.price),
-                "created_date": register.created_date
-            }
-        )
-        if result == 0:
-            return None
-        self.__session.commit()
-        return self.__db_to_entity(register_db_model)
+        result = self.get_register_by_ids(car_id, shop_id)
+        if result is not None:
+            self.__session.execute(delete(RegisterDBModel).where(RegisterDBModel.id == result.id))
+            self.__session.commit()
+            return result
+        return None
     

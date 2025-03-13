@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import select, update, delete
 from db.db_model.car_sql import CarDBModel
 from app.entities.car import Car
 from typing import Optional
@@ -56,29 +56,38 @@ class CarPostgresqlRepository():
             return self.__db_to_entity(result)
         return None
 
+    def get_car_by_fields(self, brand: str, model: str, model_year: int) -> Optional[Car]:
+        """ Get car by brand, model and model_year
+        :param brand: str
+        :param model: str
+        :param model_year: int
+        :return: Optional[car]
+        """
+        result = self.__session.execute(select(CarDBModel).where(CarDBModel.brand == brand, CarDBModel.model == model, CarDBModel.model_year == model_year)).fetchone()[0]
+        if result is not None:
+            return self.__db_to_entity(result)
+        return None
+
+
     def update(self, car: Car) -> Optional[Car]:
         """ Update car
         :param car: car
         :return: Optional[car]
-        """
-        car_db_model = CarDBModel(
-            id=car.id,
-            brand=car.brand,
-            model=car.model,
-            model_year=car.model_year
-        )
-        result = self.session.query(
-            CarDBModel
-        ).filter_by(
-            id=car.id
-        ).update(
-            {
-                "brand": car.brand,
-                "model": car.model,
-                "model_year": car.model_year
-            }
-        )
-        if result == 0:
+        """ 
+        car_db_model = self.__session.execute(update(CarDBModel).where(CarDBModel.id==car.id).values(brand=car.brand, model=car.model, model_year=car.model_year)).fetchone()[0]
+        if car_db_model is None:
             return None
-        self.session.commit()
+        self.__session.commit()
         return self.__db_to_entity(car_db_model)
+    
+    def delete(self, car_id: uuid.UUID) -> Optional[Car]:
+        """ Delete car
+        :param car_id: carId
+        :return: Optional[car]
+        """ 
+        car = self.get(car_id)
+        if car is not None:
+            self.__session.execute(delete(CarDBModel).where(CarDBModel.id == car.id))
+            self.__session.commit()
+            return car
+        return None

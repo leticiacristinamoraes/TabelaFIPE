@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update, delete
 from db.db_model.car_sql import CarDBModel
 from db.db_model.register_sql import RegisterDBModel
 from db.db_model.avg_price_sql import AvgPriceDBModel
@@ -58,29 +58,19 @@ class AvgPricePostgresqlRepository():
         return None
 
     def update(self, avg_price: AvgPrice) -> Optional[AvgPrice]:
-        """ Update avg price
-        :param avg_price: avg_price
+        """ Update avg price by id
+        :param avg_price_id: avgPriceId
+        :param avg_price: str
         :return: Optional[avg_price]
         """
-        avg_price_db_model = AvgPriceDBModel(
-            id=avg_price.id,
-            car_id=avg_price.car_id,
-            avg_price=avg_price.avg_price
+        result = self.__session.execute(
+            update(AvgPriceDBModel).where(AvgPriceDBModel.id == avg_price.id).values(AvgPriceDBModel.avg_price==avg_price.avg_price)
         )
-        result = self.__session.query(
-            AvgPriceDBModel
-        ).filter_by(
-            id=avg_price.id
-        ).update(
-            {
-                "car_id": avg_price.car_id,
-                "avg_price": avg_price.avg_price
-            }
-        )
-        if result == 0:
-            return None
-        self.__session.commit()
-        return self.__db_to_entity(avg_price_db_model)
+    
+        if result is not None:
+            self.__session.commit()
+            return avg_price
+        return None
     
     def calculate_and_store_avg_prices(self):
         """ Calcula a média de preços para cada modelo de carro e armazena no banco """

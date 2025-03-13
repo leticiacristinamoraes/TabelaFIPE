@@ -1,6 +1,7 @@
 import uuid
 
-from sqlalchemy import select
+from requests import delete
+from sqlalchemy import select, update
 from db.db_model.shop_sql import ShopDBModel
 from dataclasses import dataclass, asdict
 from app.entities.shop import Shop
@@ -51,25 +52,35 @@ class ShopPostgresqlRepository():
             return self.__db_to_entity(result)
         return None
 
+    def get_shop_by_name(self, shop_name: str) -> Optional[Shop]:
+        """ Get shop by name
+        :param name: str
+        :return: Optional[shop]
+        """
+        result = self.__session.execute(select(ShopDBModel).where(ShopDBModel.name == shop_name)).fetchone()[0]
+        if result is not None:
+            return self.__db_to_entity(result)
+        return None
+
     def update(self, shop: Shop) -> Optional[Shop]:
         """ Update shop
         :param shop: shop
         :return: Optional[shop]
         """
-        shop_db_model = ShopDBModel(
-            id=uuid.UUID(shop.id),
-            name=shop.name
-        )
-        result = self.__session.query(
-            ShopDBModel
-        ).filter_by(
-            id=uuid.UUID(shop.id)
-        ).update(
-            {
-                "name": shop.name
-            }
-        )
-        if result == 0:
-            return None
+        shop_db_model = ShopDBModel(**asdict(shop))
+        self.__session.execute(update(ShopDBModel).where(ShopDBModel.id == shop.id).values(shop_db_model))
         self.__session.commit()
-        return self.__db_to_entity(shop_db_model)
+        return shop
+    
+    def delete_by_name(self, shop_name: str) -> Optional[Shop]:
+        """ Delete shop by id
+        :param shop_id: shopId
+        :return: Optional[shop]
+        """
+        shop = self.get_shop_by_name(shop_name)
+        if shop is not None:
+            self.__session.execute(delete(ShopDBModel).where(ShopDBModel.id == shop.id))
+            self.__session.commit()
+            return shop
+        return None
+    
