@@ -1,6 +1,7 @@
 import uuid
 
-from sqlalchemy import select
+from requests import delete
+from sqlalchemy import select, update
 from db.db_model.role_sql import RoleDBModel
 from app.entities.role import Role
 from typing import Optional
@@ -50,25 +51,35 @@ class RolePostgresqlRepository():
             return self.__db_to_entity(result)
         return None
 
+    def get_role_by_name(self, name: str) -> Optional[Role]:
+        """ Get role by name
+        :param name: str
+        :return: Optional[role]
+        """
+        result = self.__session.execute(select(RoleDBModel).where(RoleDBModel.name == name)).fetchone()[0]
+        if result is not None:
+            return self.__db_to_entity(result)
+        return None
+
     def update(self, role: Role) -> Optional[Role]:
         """ Update role
         :param role: role
         :return: Optional[role]
         """
-        role_db_model = RoleDBModel(
-            id=uuid.UUID(role.id),
-            name=role.name
-        )
-        result = self.__session.query(
-            RoleDBModel
-        ).filter_by(
-            id=uuid.UUID(role.id)
-        ).update(
-            {
-                "name": role.name
-            }
-        )
-        if result == 0:
+        role_db_model = self.__session.execute(update(RoleDBModel).where(RoleDBModel.id==role.id).values(name=role.name)).fetchone()[0]
+        if role_db_model is None:
             return None
         self.__session.commit()
         return self.__db_to_entity(role_db_model)
+    
+    def delete_by_name(self, name: str) -> Optional[Role]:
+        """ Delete role
+        :param name: str
+        :return: Optional[role]
+        """
+        result = self.get_role_by_name(name)
+        if result is None:
+            return None
+        self.__session.execute(delete(RoleDBModel).where(RoleDBModel.name == name))
+        self.__session.commit()
+        return result 
