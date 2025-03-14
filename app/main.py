@@ -3,14 +3,13 @@ import os
 from dotenv import load_dotenv
 import sys
 import pandas as pd
+import psycopg2
 from database.create_tables import create_all_tables
 from database.config import get_connection
 from database.brands import get_brands
 from database.models import get_models
 from database.db_populate import populate_database
 from database.vehicles import get_vehicle_years
-
-#from database.average_price import get_vehicle_price, get_average_price
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from app.lib.auth import Authenticator
@@ -58,6 +57,8 @@ if "selected_year" not in st.session_state:
 def buscar_precos(marca=None, modelo=None, ano_fab=None, ano_modelo=None):
     """Busca preços médios dos veículos com base nos filtros informados."""
     conn = get_connection()
+    cur = conn.cursor()  # Agora o cursor está definido corretamente
+
     query = """
     SELECT b.nome AS marca, m.nome AS modelo, v.ano_fab, v.ano_modelo, ap.average_price
     FROM vehicles v
@@ -67,7 +68,7 @@ def buscar_precos(marca=None, modelo=None, ano_fab=None, ano_modelo=None):
     WHERE 1=1
     """
     params = []
-    
+
     if marca:
         query += " AND b.nome = %s"
         params.append(marca)
@@ -80,15 +81,23 @@ def buscar_precos(marca=None, modelo=None, ano_fab=None, ano_modelo=None):
     if ano_modelo:
         query += " AND v.ano_modelo = %s"
         params.append(ano_modelo)
+
+    cur.execute(query, tuple(params))
+    resultados = cur.fetchall()  # Pega os resultados da query
+
     
-    df = pd.read_sql(query, conn, params=params)
+    colunas = ["Marca", "Modelo", "Ano Fabricação", "Ano Modelo", "Preço Médio"]
+    
+    df = pd.DataFrame(resultados, columns=colunas)
+
+    cur.close()
     conn.close()
     return df
-# Interface no Streamlit
+
 st.title("Consulta Pública de Preços de Veículos")
 
 # Obtém a lista de marcas do banco de dados
-marcas = get_brands()  # Retorna [(id, "Marca1"), (id, "Marca2"), ...]
+marcas = get_brands()  
 marcas_dict = {nome: id for id, nome in marcas} if marcas else {}
 
 # Dropdown de marcas
