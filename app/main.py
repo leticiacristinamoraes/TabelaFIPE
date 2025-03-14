@@ -1,10 +1,16 @@
 import streamlit as st
 import pandas as pd
 import requests
+import time
+import os
+from dotenv import load_dotenv
+import sys
 
 from lib.data import initialize_data
 from api.fipe_api import get_brands, get_models, get_years, get_vehicle_price
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from app.lib.auth import Authenticator
 
 st.set_page_config(
     page_title="Tabela Fipe",
@@ -24,18 +30,7 @@ if 'authenticated' not in st.session_state:
 if 'user_role' not in st.session_state:
     st.session_state['user_role'] = None
 
-
 initialize_data()
-#----
-import streamlit as st
-import time
-import os
-from dotenv import load_dotenv
-import sys
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from app.lib.auth import Authenticator
-
 
 load_dotenv()
 
@@ -59,8 +54,6 @@ authenticator = Authenticator(
                 secret_path="client_secret.json",
                 redirect_uri="http://localhost:8501",
             )
-
-#-------------------------------------------------------
 
 # Creating a layout with columns to position the button in the top right corner
 col1, col2 = st.columns([8, 2]) 
@@ -88,8 +81,6 @@ with col2:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-#-------------------------------------------------------
-
 # show content that requires login
 if st.session_state["connected"]:
     email= st.session_state['user_info']['email'] 
@@ -114,9 +105,6 @@ if st.session_state["connected"]:
 
 if authenticator.valido == False:
     st.write(f"Email inválido, entre em contato com o administrador.")
-
-#--
-
 
 st.title("Tabela de preços")
 st.write("Venha conhecer os diversos preços no Brasil")
