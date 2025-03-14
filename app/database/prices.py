@@ -1,4 +1,4 @@
-from database.config import get_connection
+from app.database.config import get_connection
 
 def create_prices_table():
     conn = get_connection()

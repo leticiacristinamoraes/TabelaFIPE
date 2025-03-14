@@ -2,13 +2,11 @@ import streamlit as st
 import pandas as pd
 import sys
 import os
-
 from app.database.config import get_connection
 from app.database.stores import get_stores, create_store, update_store, delete_store
 from app.database.users import get_users, create_user, update_user, delete_user
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from lib.data import get_researchers
 
 st.set_page_config(
     page_title="Gestor",
@@ -31,7 +29,7 @@ def listar_pesquisadores():
 
 def painel_gestor():
     st.title("Painel do Gestor")
-    aba_cadastro, aba_listagem, aba_pesquisadores, aba_veiculos = st.tabs(["Cadastrar Loja", "Listar Lojas", "Gerenciar Pesquisadores", "Gerenciar Veículos"])
+    aba_cadastro, aba_listagem, aba_pesquisadores, aba_veiculos = st.tabs(["Cadastrar Loja", "Listar Lojas", "Gerenciar Usuários", "Gerenciar Veículos"])
 
     with aba_cadastro:
         st.header("Cadastrar Nova Loja")

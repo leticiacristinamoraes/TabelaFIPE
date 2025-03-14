@@ -1,20 +1,16 @@
-import streamlit as st
-import pandas as pd
-from datetime import datetime
-
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from lib.auth import check_authentication, get_user_store_assignment
-from lib.data import get_stores, get_evaluations
-
 import streamlit as st
-from database.config import get_connection
-from database.stores import get_stores
-from database.brands import get_brands
-from database.models import get_models
-from database.vehicles import get_vehicle_years
-from database.prices import create_price
+import pandas as pd
+from datetime import datetime
+from app.database.config import get_connection
+from app.database.stores import get_stores
+from app.database.brands import get_brands
+from app.database.models import get_models
+from app.database.vehicles import get_vehicle_years
+from app.database.prices import create_price
+from lib.auth import check_authentication, get_user_store_assignment
 
 st.set_page_config(
     page_title="Pagina de Pesquisador",
