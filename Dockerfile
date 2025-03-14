@@ -8,7 +8,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --frozen --no-install-project --no-dev
-ADD . /tabelafipe
+COPY . /tabelafipe
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev
  
@@ -18,7 +18,7 @@ COPY --from=builder /tabelafipe /tabelafipe
 
 ENV PATH="/tabelafipe/.venv/bin:$PATH"
 EXPOSE 8501
-
+EXPOSE 8502
 ENTRYPOINT []
-CMD ["streamlit", "run", "/tabelafipe/app/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["tabelafipe/app/streamlit", "run", "bd_test.py", "--server.port=8501", "--server.address=0.0.0.0"]
  

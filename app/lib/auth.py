@@ -7,21 +7,20 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
 from app.lib.token_manager import AuthTokenManager
-secret_path = os.path.abspath("app/lib/client_secret.json")
+from db.db_model.db_instance import user_repo
+
 
 class Authenticator:
     def __init__(
         self,
-        allowed_users: list,
-        secret_path: str,
         redirect_uri: str,
         token_key: str,
         cookie_name: str = "auth_jwt",
         token_duration_days: int = 1,
     ):
         st.session_state["connected"] = st.session_state.get("connected", False)
-        self.allowed_users = allowed_users
-        self.secret_path = secret_path
+        self.allowed_users = user_repo.get_all_emails()
+        self.secret_path = os.path.abspath("app/lib/client_secret.json")
         self.redirect_uri = redirect_uri
         self.auth_token_manager = AuthTokenManager(
             cookie_name=cookie_name,
