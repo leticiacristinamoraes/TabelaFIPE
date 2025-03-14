@@ -153,6 +153,7 @@ def insert_users():
         ("Bob", "bob@email.com", "pesquisador"),
         ("Carlos", "carlos@email.com", "gestor"),
         ("Diana", "diana@email.com", "gestor"),
+        
     ]
     
     query = "INSERT INTO users (nome, email, papel) VALUES (%s, %s, %s) ON CONFLICT (email) DO NOTHING RETURNING id;"
