@@ -1,3 +1,9 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+from dotenv import load_dotenv
+load_dotenv()
+
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, scoped_session
 from sqlalchemy import create_engine
 import db.repositories.user_repo as user_repository
@@ -13,8 +19,9 @@ import db.repositories.avg_price_repo as avg_price_repository
 
 
 #Classe para instanciar o banco de dados. 
-
-engine = create_engine('postgresql+psycopg://postgres:postgres@localhost:5432/testDB')
+DATABASE_URL = f"postgresql+psycopg://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+engine = create_engine(DATABASE_URL)
+#engine = create_engine('postgresql+psycopg://postgres:ASPIRE@localhost:5432/testDB')
 Session = scoped_session(sessionmaker(bind=engine))
 
 #Após a criação do banco de dados, é necessário instanciar os repositórios
