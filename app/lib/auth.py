@@ -6,10 +6,18 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
+<<<<<<< HEAD
 from app.lib.token_manager import AuthTokenManager
 from db.db_model.db_instance import user_repo
 
 
+=======
+
+from lib.token_manager import AuthTokenManager
+
+from app.lib.token_manager import AuthTokenManager
+secret_path = os.path.abspath("app/lib/client_secret.json")
+>>>>>>> f24d94c2e88c03a6ff8fa34ed2a7776808768202
 class Authenticator:
     def __init__(
         self,
@@ -131,16 +139,6 @@ def initialize_users():
         }
     return st.session_state.users
 
-# def check_password(username, password):
-#     """Check if username/password combination is valid."""
-#     users = initialize_users()
-#     if username in users:
-#         stored_hash = users[username]["password_hash"]
-#         input_hash = hashlib.sha256(password.encode()).hexdigest()
-#         if stored_hash == input_hash:
-#             return True, users[username]["role"]
-#     return False, None
-
 def get_user_store_assignment(username):
     """Get the store assigned to a user"""
     users = initialize_users()
@@ -148,13 +146,11 @@ def get_user_store_assignment(username):
         return users[username].get("store_id")
     return None
 
-
 def add_user(username, password, role, store_id=None):
     """Add a new user to the system"""
     users = initialize_users()
     if username in users:
         return False, "Username already exists"
-    
     
     users[username] = {
         "username": username,
