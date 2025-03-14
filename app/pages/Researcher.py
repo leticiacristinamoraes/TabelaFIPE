@@ -7,8 +7,14 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from lib.auth import check_authentication, get_user_store_assignment
 from lib.data import get_stores, get_evaluations
-from api.fipe_api import get_brands, get_models, get_years
 
+import streamlit as st
+from database.config import get_connection
+from database.stores import get_stores
+from database.brands import get_brands
+from database.models import get_models
+from database.vehicles import get_vehicle_years
+from database.prices import create_price
 
 st.set_page_config(
     page_title="Pagina de Pesquisador",
@@ -22,125 +28,65 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-#check_authentication(required_role="researcher")
-
-
 st.title("🔍 Pesquisador")
 st.write("Bem vindo de volta Pesquisador. Insira os preços dos carros da loja pesquisada")
 
+# Função para obter o ID da loja pelo nome
+def get_store_id_by_name(store_name):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id FROM stores WHERE nome = %s;", (store_name,))
+    store_id = cur.fetchone()
+    cur.close()
+    conn.close()
+    return store_id[0] if store_id else None
 
-#with st.sidebar:
-   # st.title("🚗 FIPE")
-   # st.success(f"Logado como Pesquisador")
+# Função para obter o ID da marca pelo nome
+def get_brand_id_by_name(brand_name):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id FROM brands WHERE nome = %s;", (brand_name,))
+    brand_id = cur.fetchone()
+    cur.close()
+    conn.close()
+    return brand_id[0] if brand_id else None
+
+# Layout do painel do pesquisador
+st.title("Painel do Pesquisador")
+
+# Seleção da loja
+stores = get_stores()
+store_names = [store[1] for store in stores]  # Assume que o nome da loja está na segunda posição da tupla
+selected_store = st.selectbox("Selecione a loja", store_names)
+
+# Seleção da marca
+brands = get_brands()
+brand_names = [brand[1] for brand in brands]  # Assume que o nome da marca está na segunda posição da tupla
+selected_brand = st.selectbox("Selecione a marca", brand_names)
+
+if selected_brand:
+    brand_id = get_brand_id_by_name(selected_brand)
+    models = get_models(brand_id)
+    model_names = [model[1] for model in models]
     
-  #  if st.button("Logout"):
-   #     st.session_state.authenticated = False
-  #      st.session_state.user_role = None
-  #      st.rerun()
+    # Seleção do modelo
+    selected_model = st.selectbox("Selecione o modelo", model_names)
     
-    
-  #  st.subheader("Navigation")
- #   st.write("📊 [Home Page](/)")
- #   st.write("🔍 [Researcher Dashboard](/Researcher)")
+    if selected_model:
+        model_id = [m[0] for m in models if m[1] == selected_model][0]
+        years = get_vehicle_years(model_id)
+        
+        # Seleção do ano do modelo
+        selected_year = st.selectbox("Selecione o ano do modelo", years)
 
+        # Campo para inserir o preço
+        price = st.number_input("Informe o preço", min_value=0.0, format="%.2f")
 
-st.header("Insira a pesquisa")
-
-col1, col2 = st.columns(2)
-
-
-if 'evaluations' not in st.session_state:
-    st.session_state.evaluations = []
-
-with st.form("vehicle_evaluation_form"):
-    
-    stores = get_stores()
-    user_store_id = st.session_state.get('user_store')
-    
-    if user_store_id:
-        
-        assigned_store_name = "Unknown Store"
-        for store in stores:
-            if store['id'] == user_store_id:
-                assigned_store_name = store['name']
-                break
-                
-        st.info(f"You are assigned to: {assigned_store_name}")
-        selected_store = assigned_store_name
-        store_id = user_store_id
-    else:
-        
-        store_options = {store['name']: store['id'] for store in stores}
-        selected_store = st.selectbox("Loja", options=list(store_options.keys()))
-        store_id = store_options[selected_store]
-    
-    
-    try:
-        
-        brands = get_brands()
-        brand_options = {brand['nome']: brand['codigo'] for brand in brands}
-        selected_brand_name = st.selectbox("Marca", options=list(brand_options.keys()))
-        selected_brand_code = brand_options[selected_brand_name]
-
-        
-        models = get_models(selected_brand_code)
-        model_options = {model['nome']: model['codigo'] for model in models['modelos']}
-        selected_model_name = st.selectbox("Modelo", options=list(model_options.keys()))
-        selected_model_code = model_options[selected_model_name]
-
-        
-        years = get_years(selected_brand_code, selected_model_code)
-        year_options = {year['nome']: year['codigo'] for year in years}
-        selected_year_name = st.selectbox("Ano", options=list(year_options.keys()))
-        selected_year_code = year_options[selected_year_name]
-
-        
-        evaluated_price = st.number_input("Preço levantado (R$)", min_value=0.0, step=100.0)
-        
-        
-
-        #notes = st.text_area("Notas")
-        
-        
-        submitted = st.form_submit_button("Enviar pesquisa")
-        
-        if submitted:
-            if evaluated_price <= 0:
-                st.error("Please enter a valid price.")
+        # Botão para salvar o preço
+        if st.button("Salvar Preço"):
+            store_id = get_store_id_by_name(selected_store)
+            if store_id and model_id and selected_year:
+                create_price(model_id, store_id, price)
+                st.success("Preço cadastrado com sucesso!")
             else:
-                
-                new_evaluation = {
-                    "id": len(st.session_state.evaluations) + 1,
-                    "store_id": store_id,
-                    "store_name": selected_store,
-                    "brand": selected_brand_name,
-                    "model": selected_model_name,
-                    "year": selected_year_name,
-                    "evaluated_price": evaluated_price,
-                    
-                    
-                    "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    "researcher": st.session_state.username
-                }
-                
-                
-                st.session_state.evaluations.append(new_evaluation)
-                st.success("Vehicle evaluation submitted successfully!")
-                
-    except Exception as e:
-        st.error(f"Error in vehicle selection: {str(e)}")
-        st.info("Please try again or contact support.")
-
-
-# st.header("Your Previous Evaluations")
-# evaluations = get_evaluations()
-
-
-# if 'username' in st.session_state:
-#     user_evaluations = [e for e in evaluations if e.get('researcher') == st.session_state.username]
-    
-#     if user_evaluations:
-#         evaluations_df = pd.DataFrame(user_evaluations)
-#         st.dataframe(evaluations_df, use_container_width=True)
-    # else:
-    #     st.info("You haven't submitted any evaluations yet.")
+                st.error("Erro ao cadastrar o preço. Verifique os dados e tente novamente.")
