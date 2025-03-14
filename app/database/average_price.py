@@ -39,14 +39,19 @@ def get_average_prices():
     return avg_prices
 
 def update_average_price(avg_price_id, vehicle_id, avg_price):
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute("""
-        UPDATE average_price SET veiculo_id = %s, average_price = %s WHERE id = %s;
-    """, (vehicle_id, avg_price, avg_price_id))
-    conn.commit()
-    cur.close()
-    conn.close()
+    # conn = get_connection()
+    # cur = conn.cursor()
+    # cur.execute("""
+    #     UPDATE average_price SET veiculo_id = %s, average_price = %s WHERE id = %s;
+    # """, (vehicle_id, avg_price, avg_price_id))
+    # conn.commit()
+    # cur.close()
+    # conn.close()
+    repo = AvgPricePostgresqlRepository()
+    repo.calculate_and_store_avg_prices()
+    print("Preços médios atualizados.")
+
+
 
 def delete_average_price(avg_price_id):
     conn = get_connection()
