@@ -2,17 +2,14 @@ import streamlit as st
 import pandas as pd
 import sys
 import os
+
 from app.database.config import get_connection
 from app.database.stores import get_stores, create_store, update_store, delete_store
 from app.database.users import get_users, create_user, update_user, delete_user
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
-st.set_page_config(
-    page_title="Gestor",
-    page_icon="👨‍💼",
-    layout="wide"
-)
+
 st.markdown("""
     <style>
         [data-testid="stSidebarNav"] {display: none;}

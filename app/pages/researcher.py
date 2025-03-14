@@ -13,11 +13,7 @@ from datetime import datetime
 from lib.data import get_models, get_vehicle_years,get_shops, get_cars, get_shop_id, get_brand_id_by_name, set_car_register
 from lib.auth import check_authentication, get_user_store_assignment
 
-st.set_page_config(
-    page_title="Pagina de Pesquisador",
-    page_icon="🔍",
-    layout="wide"
-)
+
 st.markdown("""
     <style>
         [data-testid="stSidebarNav"] {display: none;}
