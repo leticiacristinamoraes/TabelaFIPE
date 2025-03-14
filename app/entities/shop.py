@@ -6,7 +6,8 @@ import uuid
 class Shop:
     id: uuid.UUID
     name: str 
-
+    address: str
+    cnpj: str
 
     @classmethod
     def from_dict(cls, data):

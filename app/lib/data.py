@@ -1,3 +1,4 @@
+import uuid
 import streamlit as st
 from db.db_model.db_instance import  (   
     user_repo, 
@@ -202,6 +203,31 @@ def get_cars():
     try:
         cars = car_repo.get_all()
         return cars
+    except:
+        return ("Erro ao buscar lojas")
+def get_vehicle_years(model_id:uuid.UUID):
+    try:
+        years = car_repo.get_all_cars_years(model_id)
+        return years
+    except:
+        return ("Erro ao buscar lojas")
+def get_brand_id_by_name(brand_name):
+    try:
+        name = car_repo.get_brand_id_ny_name(brand_name)
+        return name
+    except:
+        return ("Erro ao buscar lojas")
+def get_models(brand_id: int):
+    try:
+        models = car_repo.get_all_models(brand_id)
+        return models
+    except:
+        return ("Erro ao buscar lojas")
+    
+def get_brands():
+    try:
+        brands = car_repo.get_all_brands()
+        return brands
     except:
         return ("Erro ao buscar lojas")
 def get_stores():

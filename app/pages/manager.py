@@ -11,8 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 st.set_page_config(
     page_title="Gestor",
     page_icon="👨‍💼",
-    layout="wide",
-    initial_sidebar_state="collapsed"
+    layout="wide"
 )
 st.markdown("""
     <style>

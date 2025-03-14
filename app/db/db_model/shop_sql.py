@@ -12,6 +12,7 @@ class ShopDBModel(Base):
     __tablename__ = 'Shops'
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name:Mapped[String] = mapped_column(String)
-
+    address:Mapped[String] = mapped_column(String)
+    cnpj:Mapped[String] = mapped_column(String)
     registers: Mapped[List['RegisterDBModel']] = relationship(back_populates='shops')
     users_shops: Mapped[List['UserShopDBModel']] = relationship(back_populates='shops')

@@ -5,8 +5,7 @@ import uuid
 @dataclass
 class Car:
     id: uuid.UUID
-    brand: str
-    model: str
+    model_id: uuid.UUID
     model_year: int
     
     @classmethod
@@ -20,3 +19,35 @@ class Car:
         """
         return asdict(self)
 
+@dataclass
+class Model:
+    id: uuid.UUID
+    name: str
+    brand_id: int
+    
+    @classmethod
+    def from_dict(cls, data):
+        """ Convert data from a dictionary
+        """
+        return cls(**data)
+
+    def to_dict(self):
+        """ Convert data into dictionary
+        """
+        return asdict(self)
+    
+@dataclass
+class Brand:
+    id: uuid.UUID
+    name: str
+    
+    @classmethod
+    def from_dict(cls, data):
+        """ Convert data from a dictionary
+        """
+        return cls(**data)
+
+    def to_dict(self):
+        """ Convert data into dictionary
+        """
+        return asdict(self)

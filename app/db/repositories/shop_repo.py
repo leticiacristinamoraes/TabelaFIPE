@@ -1,5 +1,7 @@
+import logging
 import uuid
 
+from psycopg import OperationalError
 from requests import delete
 from sqlalchemy import select, update
 from db.db_model.shop_sql import ShopDBModel
@@ -51,7 +53,18 @@ class ShopPostgresqlRepository():
         if result is not None:
             return self.__db_to_entity(result)
         return None
-
+    def get_all(self) -> Optional[Shop]:
+        """ Get user by id
+        :param user_id: userId
+        :return: Optional[user]
+        """
+        try:
+            result = self.__session.execute(select(ShopDBModel)).fetchall()
+            print(result)
+            if result is not None:
+                return [user[0].names for user in result]
+        except OperationalError as err:
+            logging.error("get all %s", err)
     def get_shop_by_name(self, shop_name: str) -> Optional[Shop]:
         """ Get shop by name
         :param name: str

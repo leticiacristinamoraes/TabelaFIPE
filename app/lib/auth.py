@@ -6,18 +6,10 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
-<<<<<<< HEAD
 from app.lib.token_manager import AuthTokenManager
 from db.db_model.db_instance import user_repo
 
 
-=======
-
-from lib.token_manager import AuthTokenManager
-
-from app.lib.token_manager import AuthTokenManager
-secret_path = os.path.abspath("app/lib/client_secret.json")
->>>>>>> f24d94c2e88c03a6ff8fa34ed2a7776808768202
 class Authenticator:
     def __init__(
         self,

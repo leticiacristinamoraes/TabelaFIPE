@@ -14,7 +14,7 @@ import db.repositories.avg_price_repo as avg_price_repository
 from sqlalchemy_utils import database_exists, create_database
 
 #Classe para instanciar o banco de dados. 
-url = 'postgresql+psycopg://postgres:postgres@localhost:5432/testDB3'
+url = 'postgresql+psycopg://postgres:postgres@localhost:5432/testDB4'
 if not database_exists(url):
     create_database(url)
 engine = create_engine(url, echo=True)

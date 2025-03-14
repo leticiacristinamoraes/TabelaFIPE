@@ -4,19 +4,19 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-from app.database.config import get_connection
-from app.database.stores import get_stores
-from app.database.brands import get_brands
-from app.database.models import get_models
-from app.database.vehicles import get_vehicle_years
-from app.database.prices import create_price
+
+# from database.config import get_connection
+# from database.stores import get_stores
+# from database.brands import get_brands
+# from database.models import get_models
+# from database.vehicles import get_vehicle_years
+from lib.data import get_models, get_vehicle_years,get_shops, get_cars, get_shop_id, get_brand_id_by_name, set_car_register
 from lib.auth import check_authentication, get_user_store_assignment
 
 st.set_page_config(
     page_title="Pagina de Pesquisador",
     page_icon="🔍",
-    layout="wide",
-    initial_sidebar_state="collapsed"
+    layout="wide"
 )
 st.markdown("""
     <style>
@@ -26,7 +26,7 @@ st.markdown("""
 
 st.title("🔍 Pesquisador")
 st.write("Bem vindo de volta Pesquisador. Insira os preços dos carros da loja pesquisada")
-
+'''
 # Função para obter o ID da loja pelo nome
 def get_store_id_by_name(store_name):
     conn = get_connection()
@@ -50,13 +50,14 @@ def get_brand_id_by_name(brand_name):
 # Layout do painel do pesquisador
 st.title("Painel do Pesquisador")
 
-# Seleção da loja
-stores = get_stores()
+# Seleção da loja leticia
 store_names = [store[1] for store in stores]  # Assume que o nome da loja está na segunda posição da tupla
-selected_store = st.selectbox("Selecione a loja", store_names)
+'''
 
-# Seleção da marca
-brands = get_brands()
+
+'''
+# Seleção da marca leticia
+brands = get_cars()
 brand_names = [brand[1] for brand in brands]  # Assume que o nome da marca está na segunda posição da tupla
 selected_brand = st.selectbox("Selecione a marca", brand_names)
 
@@ -74,15 +75,39 @@ if selected_brand:
         
         # Seleção do ano do modelo
         selected_year = st.selectbox("Selecione o ano do modelo", years)
+'''
 
-        # Campo para inserir o preço
+shops = get_shops()
+store_names = [store.name for store in shops]  # Assume que o nome da loja está na segunda posição da tupla
+selected_store = st.selectbox("Selecione a loja", store_names)
+
+cars = get_cars()
+brand_options = [brand.name for brand in cars]
+selected_brand_name = st.selectbox("Marca", options=brand_options)
+
+    
+if selected_brand_name:
+    brand_id = get_brand_id_by_name(selected_brand_name)
+    models = get_models(brand_id)
+    models_names = [model.name for model in models]
+
+    selected_model_name = st.selectbox("Modelo", options=models_names)
+
+
+    
+    if selected_model_name:
+        model_id = [model.id for model in models if model.name == selected_model_name]
+        year_options = get_vehicle_years(model_id=model_id)
+        selected_year = st.selectbox("Ano", options=year_options)
+
+    # Campo para inserir o preço
         price = st.number_input("Informe o preço", min_value=0.0, format="%.2f")
 
         # Botão para salvar o preço
         if st.button("Salvar Preço"):
-            store_id = get_store_id_by_name(selected_store)
+            store_id = get_shop_id(selected_store)
             if store_id and model_id and selected_year:
-                create_price(model_id, store_id, price)
+                set_car_register(model_id, store_id, price)
                 st.success("Preço cadastrado com sucesso!")
             else:
                 st.error("Erro ao cadastrar o preço. Verifique os dados e tente novamente.")
