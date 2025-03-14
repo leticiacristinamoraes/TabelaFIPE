@@ -19,10 +19,12 @@ class ShopPostgresqlRepository():
     ) -> Optional[Shop]:
         return Shop(
             id=db_row.id,
-            name=db_row.name
+            name=db_row.name,
+            address = db_row.address,
+            cnpj = db_row.cnpj
         )
 
-    def create(self, name: str) -> Optional[Shop]:
+    def create(self, name: str, address:str, cnpj:str) -> Optional[Shop]:
         """ Create shop
         :param name: str
         :return: Optional[shop]
@@ -30,7 +32,9 @@ class ShopPostgresqlRepository():
         shop_id = uuid.uuid4()
         shop_db_model = ShopDBModel(
             id=shop_id,
-            name=name
+            name=name,
+            address = address,
+            cnpj = cnpj
         )
 
         try:

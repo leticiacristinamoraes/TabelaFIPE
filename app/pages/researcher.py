@@ -1,6 +1,6 @@
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import streamlit as st
 import pandas as pd
 from datetime import datetime
@@ -10,7 +10,7 @@ from datetime import datetime
 # from database.brands import get_brands
 # from database.models import get_models
 # from database.vehicles import get_vehicle_years
-from lib.data import get_models, get_vehicle_years,get_shops, get_cars, get_shop_id, get_brand_id_by_name, set_car_register
+from lib.data import get_brands, get_models, get_vehicle_years,get_shops, get_cars, get_shop_id, get_brand_id_by_name, set_car_register
 from lib.auth import check_authentication, get_user_store_assignment
 
 
@@ -77,7 +77,7 @@ shops = get_shops()
 store_names = [store.name for store in shops]  # Assume que o nome da loja está na segunda posição da tupla
 selected_store = st.selectbox("Selecione a loja", store_names)
 
-cars = get_cars()
+cars = get_brands()
 brand_options = [brand.name for brand in cars]
 selected_brand_name = st.selectbox("Marca", options=brand_options)
 

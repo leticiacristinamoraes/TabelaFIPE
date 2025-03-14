@@ -3,6 +3,8 @@ from sqlalchemy.orm import DeclarativeBase, sessionmaker, scoped_session
 from sqlalchemy import create_engine
 import db.repositories.user_repo as user_repository
 import db.repositories.car_repo as car_repository
+import db.repositories.model_repo as model_repository
+import db.repositories.brand_repo as brand_repository
 import db.repositories.register_repo as register_repository
 import db.repositories.shop_repo as shop_repository
 import db.repositories.permission_repo as permission_repository
@@ -17,7 +19,7 @@ from sqlalchemy_utils import database_exists, create_database
 url = 'postgresql+psycopg://postgres:postgres@localhost:5432/testDB4'
 if not database_exists(url):
     create_database(url)
-engine = create_engine(url, echo=True)
+engine = create_engine(url)
 
     
 
@@ -32,6 +34,8 @@ role_repo = role_repository.RolePostgresqlRepository(Session)
 permission_repo = permission_repository.PermissionPostgresqlRepository(Session)
 user_role_repo = user_role_repository.UserRolePostgresqlRepository(Session)
 role_permission_repo = role_permission_repository.RolePermissionPostgresqlRepository(Session)
+brand_repo = brand_repository.CarPostgresqlRepository(Session)
+model_repo = model_repository.CarPostgresqlRepository(Session)
 car_repo = car_repository.CarPostgresqlRepository(Session)
 shop_repo = shop_repository.ShopPostgresqlRepository(Session)
 user_shop_repo = user_shop_repository.UserShopPostgresqlRepository(Session)

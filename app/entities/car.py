@@ -23,7 +23,7 @@ class Car:
 class Model:
     id: uuid.UUID
     name: str
-    brand_id: int
+    brand_id: uuid.UUID
     
     @classmethod
     def from_dict(cls, data):

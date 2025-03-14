@@ -2,7 +2,6 @@ import uuid
 from sqlalchemy import Column, ForeignKey, String
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID
-from db.db_model.car_sql import CarDBModel
 from db.db_model.db_base_postgresql import Base
 
 #Essa classe é um objeto de mapeamento relacional (ORM) que representa a tabela AvgPrice no Banco de Dados.
@@ -15,5 +14,5 @@ class AvgPriceDBModel(Base):
     car_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('Cars.id'))
     avg_price: Mapped[String] = mapped_column(String)
     
-    car: Mapped[CarDBModel] = relationship(back_populates='avg_price')
+    car: Mapped['CarDBModel'] = relationship(back_populates='avg_price')
     

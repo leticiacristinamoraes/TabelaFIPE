@@ -2,7 +2,9 @@ import uuid
 import streamlit as st
 from db.db_model.db_instance import  (   
     user_repo, 
-    car_repo, 
+    car_repo,
+    model_repo,
+    brand_repo,
     register_repo, 
     shop_repo,
     permission_repo, 
@@ -85,36 +87,22 @@ def initialize_data():
             }
         ]
 
-def get_role_id(role_name):
-    role = role_repo.get_role_by_name(role_name)
-    return role.id
-def get_permission_id(permission_name):
-    permission = permission_repo.get_permission_by_name(permission_name)
-    return permission.id
-def get_role_permissions(role_id):
-    role_permissions = role_permission_repo.get_role_permission(role_id)
-    return role_permissions
 
 def get_user_id(user_email):
     user = user_repo.get_user_by_email(user_email)
     return user.id
-    
-def get_shop_id(shop_name):
-    shop_id = shop_repo.get_shop_by_name(shop_name)
-    return shop_id
 
-def get_car_id(brand, model, model_year):
-    car = car_repo.get_car_by_fields(brand, model, model_year)
-    return car.id
+def get_role_id(role_name):
+    role = role_repo.get_role_by_name(role_name)
+    return role.id
 
-def get_register_price_by_car(car_id):
-    prices = register_repo.get_prices_by_car(car_id)
-    return prices
+def get_permission_id(permission_name):
+    permission = permission_repo.get_permission_by_name(permission_name)
+    return permission.id
 
-def get_avg_price_by_car(brand, model, model_year):
-    car_id = get_car_id(brand, model, model_year)
-    avg_price = avg_price_repo.get_avg_price_by_car_id(car_id)
-    return avg_price
+def get_role_permissions(role_id):
+    role_permissions = role_permission_repo.get_role_permission(role_id)
+    return role_permissions
 
 def check_user_role(user_email, role_name):
     user_id = get_user_id(user_email)
@@ -130,7 +118,24 @@ def check_role_permission(role_name, permission_name):
         check = role_permission_repo.get_role_permission_by_ids(role_id=role_id, permission_id=permission_id)
         return True
     except:
-        return ("usuario não tem papel atribuido.")
+        return ("usuario não tem papel atribuido.")  
+    
+def get_shop_id(shop_name):
+    shop_id = shop_repo.get_shop_by_name(shop_name)
+    return shop_id
+
+def get_car_id(model_id, model_year):
+    car = car_repo.get_car_by_fields(model_id, model_year)
+    return car.id
+
+def get_register_price_by_car(car_id):
+    prices = register_repo.get_prices_by_car(car_id)
+    return prices
+
+def get_avg_price_by_car(model_id, model_year):
+    car_id = get_car_id(model_id, model_year)
+    avg_price = avg_price_repo.get_avg_price_by_car_id(car_id)
+    return avg_price
 
 def get_user_shops(user_id):
     user_shops = user_shop_repo.get_all_shops_by_user_id(user_id)
@@ -199,37 +204,44 @@ def get_shops():
         return shops
     except:
         return ("Erro ao buscar lojas")
+    
 def get_cars():
     try:
         cars = car_repo.get_all()
         return cars
     except:
         return ("Erro ao buscar lojas")
+    
 def get_vehicle_years(model_id:uuid.UUID):
-    try:
-        years = car_repo.get_all_cars_years(model_id)
-        return years
-    except:
-        return ("Erro ao buscar lojas")
+
+    years = car_repo.get_cars_years(model_id)
+    print(years)
+    return years
+
 def get_brand_id_by_name(brand_name):
     try:
-        name = car_repo.get_brand_id_ny_name(brand_name)
-        return name
-    except:
-        return ("Erro ao buscar lojas")
-def get_models(brand_id: int):
+        brand_id = brand_repo.get_brand_id_by_name(brand_name)
+      
+        return brand_id
+    except Exception as e:
+        return (e)
+    
+def get_models(brand_id: uuid.UUID):
     try:
-        models = car_repo.get_all_models(brand_id)
+        models = model_repo.get_all_models(brand_id)
+  
         return models
-    except:
-        return ("Erro ao buscar lojas")
+    except Exception as e:
+        return (e)
     
 def get_brands():
     try:
-        brands = car_repo.get_all_brands()
+        brands = brand_repo.get_all_brands()
+       
         return brands
     except:
         return ("Erro ao buscar lojas")
+    
 def get_stores():
     """Get stores data from session state."""
     if 'stores' not in st.session_state:
