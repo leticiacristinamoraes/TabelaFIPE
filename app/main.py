@@ -1,6 +1,9 @@
 import streamlit as st
 import os
 from dotenv import load_dotenv
+import threading
+import schedule
+import time
 import sys
 import pandas as pd
 import psycopg2
@@ -27,6 +30,24 @@ def database_ja_populado():
 
 if not database_ja_populado():
    populate_database()
+
+# Função para rodar o agendador
+def rodar_agendador():
+    """Executa o agendador em loop para verificar tarefas pendentes."""
+    schedule.every().day.at("03:00").do(update_average_price)  # Define a tarefa para 03:00 AM
+
+    while True:
+        schedule.run_pending()
+        time.sleep(60)  # Espera 60 segundos antes de verificar novamente
+
+
+# Garantir que o agendador só seja iniciado uma vez
+if "agendador_iniciado" not in st.session_state:
+    st.session_state["agendador_iniciado"] = True  # Marca como iniciado
+    thread = threading.Thread(target=rodar_agendador, daemon=True)
+    thread.start()
+
+
 
 st.set_page_config(
     page_title="Tabela Fipe",
