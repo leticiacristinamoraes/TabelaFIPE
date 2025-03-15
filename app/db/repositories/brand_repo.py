@@ -75,7 +75,7 @@ class BrandPostgresqlRepository():
         try:
             result = self.__session.execute(select(BrandDBModel)).fetchall()
             if result is not None:
-                return [self.__db_to_entity_brand(brand[0]) for brand in result]
+                return [self.__db_to_entity(brand[0]) for brand in result]
         except OperationalError as err:
             logging.error("get all %s", err)
     
@@ -84,7 +84,7 @@ class BrandPostgresqlRepository():
         result = self.__session.execute(select(BrandDBModel).where(BrandDBModel.name == brand_name)).fetchone()[0]
       
         if result is not None:
-            return self.__db_to_entity_brand(result).id
+            return self.__db_to_entity(result).id
         return None
     
     

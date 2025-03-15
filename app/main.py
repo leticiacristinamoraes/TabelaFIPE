@@ -1,4 +1,5 @@
 import os
+from sched import scheduler
 from typing import List
 import streamlit as st
 import dotenv
@@ -6,21 +7,42 @@ import pandas as pd
 from lib.auth import Authenticator
 from lib.data import (get_models,check_user_role, get_avg_price_by_car, get_brands, get_cars, initialize_data, set_role_to_user,
  get_vehicle_years,get_shops, get_cars, get_shop_id, get_brand_id_by_name, set_car_register)
-
+st.set_page_config(
+    page_title="Tabela Fipe",
+    page_icon="🚗",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
 dotenv.load_dotenv()
 #create_all_tables()
 '''
-def database_ja_populado():
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT COUNT(*) FROM brands;")
-    count = cur.fetchone()[0]
-    conn.close()
-    return count > 0 
+def rodar_agendador():
+    """Executa o agendador em loop para verificar tarefas pendentes."""
+    scheduler.every().day.at("03:00").do(update_average_price)  # Define a tarefa para 03:00 AM
 
-if not database_ja_populado():
-   populate_database()
+    while True:
+        schedule.run_pending()
+        time.sleep(60)  # Espera 60 segundos antes de verificar novamente
+
+# Garantir que o agendador só seja iniciado uma vez
+if "agendador_iniciado" not in st.session_state:
+    st.session_state["agendador_iniciado"] = True  # Marca como iniciado
+    thread = threading.Thread(target=rodar_agendador, daemon=True)
+    thread.start()
 '''
+
+
+# Initialize session state variables if they don't exist
+if "connected" not in st.session_state:
+    st.session_state["connected"] = False
+if "user_info" not in st.session_state:
+    st.session_state["user_info"] = None
+if "user_role" not in st.session_state:  # Adicionando controle de papéis
+    st.session_state["user_role"] = None
+if "logout" not in st.session_state:
+    st.session_state["logout"] = False
+if "autenticador" not in st.session_state:
+    st.session_state["autenticador"] = None
 st.title("Tabela de preços de veículos")
 
 # Inicializa autenticação
@@ -39,6 +61,40 @@ if "selected_year" not in st.session_state:
     st.session_state["selected_year"] = None
 
 
+# Creating a layout with columns to position the button in the top right corner
+col1, col2 = st.columns([8, 2]) 
+
+# Left part (Title)
+with col1:
+    st.title("Confira a melhor tabela do mercado")
+
+# Right part (Login)
+with col2:
+    st.markdown("<div style='text-align: right;'>", unsafe_allow_html=True)
+    if not st.session_state["connected"]:   
+        authenticator.check_auth()
+        authenticator.login()
+            
+    else:
+        email = st.session_state['user_info']['email']
+        username = email.split("@")[0] 
+        st.write(f"{username}")
+   
+    if st.button("Logout"):
+            authenticator.logout()
+            st.session_state["connected"] = False
+            st.session_state["user_info"] = None
+            st.session_state["user_role"] = None
+            """ 
+            # Atualiza a lista de e-mails e papéis após logout
+            users = get_users()  # Atualiza os dados de usuários
+            emails = [user[2] for user in users]  # Atualiza a lista de e-mails
+            """
+            # Re-atualiza a autenticação com os e-mails mais recentes
+            """  emails_string = ",".join(emails)
+            allowed_users = emails_string.split(",") 
+            """
+
 st.markdown("</div>", unsafe_allow_html=True)
 
 #-------------------------------------------------------
@@ -46,22 +102,21 @@ st.markdown("</div>", unsafe_allow_html=True)
 # show content that requires login
 if st.session_state["connected"]:
     email= st.session_state['user_info']['email'] 
-    
-   #
+    roles = st.session_state['user_role'].role
     gestor, pesquisador = st.columns(2)
+
     with gestor:
          # if email['role']== 'gestor':
         if st.button("Gestor", use_container_width=True):
-            if check_user_role('email@gmail.com', 'manager'):
+            if check_user_role(email, 'manager'):
                 st.session_state.user_role = 'manager'
 
                 st.switch_page("pages/Manager.py")                    
                 st.write("👨‍💼 [Gestor Acelera Sao Paulo](Manager.py)")
-            
+
     with pesquisador:
         #if email['role']== 'pesquisador'  
         if st.button("Pesquisador", use_container_width=True):
-            if check_user_role('email@gmail.com', 'researcher'):
                st.session_state.user_role = 'researcher'
                st.write("🔍 [Pesquisador](Researcher.py)")
                st.switch_page("pages/Researcher.py")
@@ -106,7 +161,7 @@ try:
                 with st.spinner("Fetching price information..."):
                     df = get_avg_price_by_car(model_id, ano_selecionado)
                     
-                    if df.empty:
+                    if not df:
                         st.warning("Nenhum resultado encontrado.")
                     else:
                         st.dataframe(df)

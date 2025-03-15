@@ -10,7 +10,7 @@ from entities.car import Car, Model, Brand
 from typing import Optional
 
 # Classe de repositório de cars para realizar CRUD com o banco de dados.
-class CarPostgresqlRepository():
+class ModelPostgresqlRepository():
     def __init__(self, session) -> None:
         self.__session = session
 

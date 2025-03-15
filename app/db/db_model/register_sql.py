@@ -1,7 +1,7 @@
 import datetime
 from typing import List
 import uuid
-from sqlalchemy import Column, Date, DateTime, ForeignKey, String, func
+from sqlalchemy import Column, Date, DateTime, ForeignKey, Numeric, String, func
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID
 from db.db_model.db_base_postgresql import Base
@@ -17,7 +17,7 @@ class RegisterDBModel(Base):
     car_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('Cars.id'))
     created_date: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now())
-    price: Mapped[String] = mapped_column(String)
+    price: Mapped[float] = mapped_column(Numeric(10,2))
 
     shops: Mapped[List['ShopDBModel']] = relationship( back_populates='registers')
     cars: Mapped[List['CarDBModel']] = relationship(back_populates='registers')

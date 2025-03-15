@@ -66,7 +66,7 @@ class ShopPostgresqlRepository():
             result = self.__session.execute(select(ShopDBModel)).fetchall()
             print(result)
             if result is not None:
-                return [user[0].names for user in result]
+                return [user[0] for user in result]
         except OperationalError as err:
             logging.error("get all %s", err)
     def get_shop_by_name(self, shop_name: str) -> Optional[Shop]:

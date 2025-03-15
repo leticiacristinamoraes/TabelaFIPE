@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import delete, select, update
+from sqlalchemy import delete, select, text, update
 from db.db_model.user_role_sql import UserRoleDBModel
 from app.entities.user_role import UserRole
 from dataclasses import dataclass, asdict
@@ -105,5 +105,20 @@ class UserRolePostgresqlRepository():
         if result is not None:
             self.__session.execute(delete(UserRoleDBModel).where(UserRoleDBModel.id == result.id))
             self.__session.commit()
+            return result
+        return None
+    
+    def inner_join(self, user_id:uuid.UUID):
+        
+        query = (text('''
+        SELECT "Users".email, "Roles".name AS "role", "Permissions".name AS "permissions" FROM "Users" 
+                      INNER JOIN "Users_roles" ON "Users".id=:user_id
+                      INNER JOIN "Roles" ON "Users_roles".role_id="Roles".id INNER JOIN "Roles_permissions" ON "Roles".id="Roles_permissions".role_id 
+                      INNER JOIN "Permissions" ON "Roles_permissions".permission_id="Permissions".id'''))
+        
+        result = self.__session.execute(query, {'user_id':user_id}).fetchone()
+        
+        print(result)
+        if result is not None:
             return result
         return None

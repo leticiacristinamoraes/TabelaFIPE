@@ -3,6 +3,8 @@ import streamlit as st
 import sys
 import os
 
+from lib.data import get_role_and_permissions
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
@@ -87,15 +89,17 @@ class Authenticator:
             user_info = oauth_service.userinfo().get().execute()
             oauth_id = user_info.get("id")
             email = user_info.get("email")
-
+    
             if email in self.allowed_users:
                 self.auth_token_manager.set_token(email, oauth_id)
+                st.session_state["user_role"] = get_role_and_permissions(email)
                 st.session_state["connected"] = True
                 st.session_state["user_info"] = {
                     "oauth_id": oauth_id,
                     "email": email,
                 }
                 self.valido = True
+                st.rerun()
             else:
                 st.toast(":red[access denied: Unauthorized user]")
                 self.valido = False

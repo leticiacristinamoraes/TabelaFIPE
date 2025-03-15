@@ -22,88 +22,42 @@ st.markdown("""
 
 st.title("🔍 Pesquisador")
 st.write("Bem vindo de volta Pesquisador. Insira os preços dos carros da loja pesquisada")
-'''
-# Função para obter o ID da loja pelo nome
-def get_store_id_by_name(store_name):
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT id FROM stores WHERE nome = %s;", (store_name,))
-    store_id = cur.fetchone()
-    cur.close()
-    conn.close()
-    return store_id[0] if store_id else None
 
-# Função para obter o ID da marca pelo nome
-def get_brand_id_by_name(brand_name):
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT id FROM brands WHERE nome = %s;", (brand_name,))
-    brand_id = cur.fetchone()
-    cur.close()
-    conn.close()
-    return brand_id[0] if brand_id else None
-
-# Layout do painel do pesquisador
-st.title("Painel do Pesquisador")
-
-# Seleção da loja leticia
-store_names = [store[1] for store in stores]  # Assume que o nome da loja está na segunda posição da tupla
-'''
-
-
-'''
-# Seleção da marca leticia
-brands = get_cars()
-brand_names = [brand[1] for brand in brands]  # Assume que o nome da marca está na segunda posição da tupla
-selected_brand = st.selectbox("Selecione a marca", brand_names)
-
-if selected_brand:
-    brand_id = get_brand_id_by_name(selected_brand)
-    models = get_models(brand_id)
-    model_names = [model[1] for model in models]
-    
-    # Seleção do modelo
-    selected_model = st.selectbox("Selecione o modelo", model_names)
-    
-    if selected_model:
-        model_id = [m[0] for m in models if m[1] == selected_model][0]
-        years = get_vehicle_years(model_id)
-        
-        # Seleção do ano do modelo
-        selected_year = st.selectbox("Selecione o ano do modelo", years)
-'''
 
 shops = get_shops()
-store_names = [store.name for store in shops]  # Assume que o nome da loja está na segunda posição da tupla
-selected_store = st.selectbox("Selecione a loja", store_names)
+store_names = {shop.name:shop.id  for shop in shops} if shops else {}  # Assume que o nome da loja está na segunda posição da tupla
+selected_store = st.selectbox("Selecione a loja", list(store_names.keys()))
 
-cars = get_brands()
-brand_options = [brand.name for brand in cars]
-selected_brand_name = st.selectbox("Marca", options=brand_options)
+brands = get_brands()
+brand_options = {brand.name: brand.id for brand in brands} if brands else {}
 
-    
-if selected_brand_name:
-    brand_id = get_brand_id_by_name(selected_brand_name)
+    # Dropdown de marcas
+marca_selecionada = st.selectbox("Marca", ["Selecione"] + list(brand_options.keys()))
+
+    # Se a marca foi selecionada, busca os modelos
+if marca_selecionada != "Selecione":
+    brand_id = get_brand_id_by_name(marca_selecionada)
+
     models = get_models(brand_id)
-    models_names = [model.name for model in models]
+    models_names = {model.name: model.id for model in models} if models else {}
 
-    selected_model_name = st.selectbox("Modelo", options=models_names)
+    # Dropdown de modelos
+    modelo_selecionado = st.selectbox("Modelo", ["Selecione"] + list(models_names.keys()))
 
+    # Se um modelo foi selecionado, busca os anos disponíveis
+    if modelo_selecionado != "Selecione":
+        model_id = models_names[modelo_selecionado]
+        years = get_vehicle_years(model_id=model_id)
 
-    
-    if selected_model_name:
-        model_id = [model.id for model in models if model.name == selected_model_name]
-        year_options = get_vehicle_years(model_id=model_id)
-        selected_year = st.selectbox("Ano", options=year_options)
-
-    # Campo para inserir o preço
+        ano_selecionado = st.selectbox("Ano do veículo", ["Selecione"] + years)
+            
+# Campo para inserir o preço
         price = st.number_input("Informe o preço", min_value=0.0, format="%.2f")
 
         # Botão para salvar o preço
         if st.button("Salvar Preço"):
-            store_id = get_shop_id(selected_store)
-            if store_id and model_id and selected_year:
-                set_car_register(model_id, store_id, price)
+            if model_id and ano_selecionado and price:
+                set_car_register(marca_selecionada, model_id,ano_selecionado, store_names[selected_store], str(price))
                 st.success("Preço cadastrado com sucesso!")
             else:
                 st.error("Erro ao cadastrar o preço. Verifique os dados e tente novamente.")

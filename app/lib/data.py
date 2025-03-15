@@ -1,5 +1,6 @@
 import uuid
 import streamlit as st
+from entities.authen import URPClass
 from db.db_model.db_instance import  (   
     user_repo, 
     car_repo,
@@ -95,7 +96,15 @@ def get_user_id(user_email):
 def get_role_id(role_name):
     role = role_repo.get_role_by_name(role_name)
     return role.id
+def get_role_and_permissions(user_email):
+    user = get_user_id(user_email=user_email)
+    result = user_role_repo.inner_join(user)
 
+    return URPClass(
+        email= result[0],
+        role= result[1],
+        permission=result[3]
+    )
 def get_permission_id(permission_name):
     permission = permission_repo.get_permission_by_name(permission_name)
     return permission.id
@@ -135,6 +144,7 @@ def get_register_price_by_car(car_id):
 def get_avg_price_by_car(model_id, model_year):
     car_id = get_car_id(model_id, model_year)
     avg_price = avg_price_repo.get_avg_price_by_car_id(car_id)
+    print(avg_price)
     return avg_price
 
 def get_user_shops(user_id):
@@ -148,7 +158,7 @@ def set_user(user_name, user_email):
 def set_role(role_name):
     result = role_repo.create(role_name)
     return result
-
+@roles_required('manager')
 def set_shop(shop_name):
     result = shop_repo.create(shop_name)
     return result
@@ -179,9 +189,9 @@ def set_car(brand, model,model_year):
     result = car_repo.create(brand, model, model_year)
     return result
 
-def set_car_register(brand, model, model_year, price, shop_name):
-    car_id = get_car_id(brand, model, model_year)
-    shop_id = get_shop_id(shop_name)
+def set_car_register(brand, model_id, model_year,shop_id,price):
+    car_id = get_car_id( model_id, model_year)
+    #shop_id = get_shop_id(shop_name)
     result = register_repo.create(car_id, shop_id, price)
     return result
 

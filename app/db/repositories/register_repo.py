@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import select, delete
+from sqlalchemy import func, select, delete, text
 from db.db_model.car_sql import CarDBModel
 from db.db_model.register_sql import RegisterDBModel
 
@@ -90,5 +90,16 @@ class RegisterPostgresqlRepository():
             self.__session.execute(delete(RegisterDBModel).where(RegisterDBModel.id == result.id))
             self.__session.commit()
             return result
+        return None
+    
+    def calculate_avg_price(self, car_id):
+        query = (
+           text('''SELECT AVG(price) AS avg_price FROM "Registers" WHERE car_id=:car_id;''')
+        )
+
+        result = self.__session.execute(query,{'car_id':car_id}).fetchone()[0]
+        print(result)
+        if result is not None:
+            return  {'car_id': car_id, 'new_avg_price': result}
         return None
     
