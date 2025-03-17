@@ -14,6 +14,7 @@ from database.models import get_models
 from database.users import get_users
 from database.db_populate import populate_database
 from database.vehicles import get_vehicle_years
+from database.average_price import calculate_and_update_average_price
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from app.lib.auth import Authenticator
@@ -35,7 +36,9 @@ if not database_ja_populado():
 # Função para rodar o agendador
 def rodar_agendador():
     """Executa o agendador em loop para verificar tarefas pendentes."""
-    schedule.every().day.at("03:00").do(update_average_price)  # Define a tarefa para 03:00 AM
+    
+    
+    schedule.every().day.at("03:00").do(calculate_and_update_average_price)  # Define a tarefa para 03:00 AM
 
     while True:
         schedule.run_pending()
@@ -148,11 +151,11 @@ if "selected_model" not in st.session_state:
     st.session_state["selected_model"] = None
 if "selected_year" not in st.session_state:
     st.session_state["selected_year"] = None
-
-def buscar_precos(marca=None, modelo=None, ano_fab=None, ano_modelo=None):
-    """Busca preços médios dos veículos com base nos filtros informados."""
+  
+def buscar_precos_medios(marca=None, modelo=None, ano=None):
+    """Retorna os preços médios dos veículos já armazenados na tabela average_price."""
     conn = get_connection()
-    cur = conn.cursor()  # Agora o cursor está definido corretamente
+    cur = conn.cursor()
 
     query = """
     SELECT b.nome AS marca, m.nome AS modelo, v.ano_fab, v.ano_modelo, ap.average_price
@@ -170,23 +173,20 @@ def buscar_precos(marca=None, modelo=None, ano_fab=None, ano_modelo=None):
     if modelo:
         query += " AND m.nome = %s"
         params.append(modelo)
-    if ano_fab:
+    if ano:
         query += " AND v.ano_fab = %s"
-        params.append(ano_fab)
-    if ano_modelo:
-        query += " AND v.ano_modelo = %s"
-        params.append(ano_modelo)
+        params.append(ano)
 
     cur.execute(query, tuple(params))
-    resultados = cur.fetchall()  # Pega os resultados da query
-
-    colunas = ["Marca", "Modelo", "Ano Fabricação", "Ano Modelo", "Preço Médio"]
-    
-    df = pd.DataFrame(resultados, columns=colunas)
+    resultados = cur.fetchall()
 
     cur.close()
     conn.close()
+
+    import pandas as pd
+    df = pd.DataFrame(resultados, columns=["Marca", "Modelo", "Ano Fabricação", "Ano Modelo", "Preço Médio"])
     return df
+
 
 st.title("Consulta Pública de Preços de Veículos")
 
@@ -217,10 +217,17 @@ if marca_selecionada != "Selecione":
         # Se um ano foi selecionado, buscar os preços
         if ano_selecionado != "Selecione":
             if st.button("Buscar preços"):
-                df = buscar_precos(marca_selecionada, modelo_selecionado, ano_selecionado)
+                df = buscar_precos_medios(marca_selecionada, modelo_selecionado, ano_selecionado)
+    
                 if df.empty:
-                    st.warning("Nenhum resultado encontrado.")
+                   st.warning("Nenhum resultado encontrado.")
                 else:
-                    st.dataframe(df)
+                    st.dataframe(df)  # Exibe a tabela completa
+        
+        # Exibir o preço médio destacado
+                    preco_medio = df["Preço Médio"].mean()  # Como já buscamos da average_price, deve ser um único valor
+                    if not pd.isna(preco_medio):
+                       st.metric(label="Preço Médio do Veículo", value=f"R$ {preco_medio:,.2f}")
+
 
 
