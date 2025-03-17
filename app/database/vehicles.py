@@ -1,4 +1,5 @@
-from app.database.config import get_connection
+from psycopg import IntegrityError
+from database.config import get_connection
 
 def create_vehicles_table():
     conn = get_connection()
@@ -31,7 +32,7 @@ def create_vehicle(model_id, ano_fab, ano_modelo):
         """, (model_id, ano_fab, ano_modelo))
         vehicle_id = cur.fetchone()[0]
         conn.commit()
-    except psycopg2.IntegrityError:  # Captura erro de violação da UNIQUE constraint
+    except IntegrityError:  # Captura erro de violação da UNIQUE constraint
         conn.rollback()  # Reverte a transação para evitar bloqueios
         cur.execute("""
             SELECT id FROM vehicles 
@@ -52,6 +53,50 @@ def get_vehicles():
     cur.close()
     conn.close()
     return vehicles
+
+def get_vehicles_with_average_price():
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT 
+            v.id AS veiculo_id,
+            v.model_id,
+            v.ano_fab,
+            v.ano_modelo,
+            COALESCE(ap.average_price, 0) AS preco_medio
+        FROM vehicles v
+        LEFT JOIN average_price ap ON v.id = ap.veiculo_id;
+    """)
+
+    vehicles = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return vehicles  # Retorna uma lista de tuplas (veiculo_id, model_id, ano_fab, ano_modelo, preco_medio)
+
+
+def get_vehicle_with_average_price(veiculo_id):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT 
+            v.id AS veiculo_id,
+            v.model_id,
+            v.ano_fab,
+            v.ano_modelo,
+            COALESCE(ap.average_price, 0) AS preco_medio
+        FROM vehicles v
+        LEFT JOIN average_price ap ON v.id = ap.veiculo_id
+        WHERE v.id = %s;
+    """, (veiculo_id,))
+
+    vehicle = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    return vehicle  # Retorna (veiculo_id, model_id, ano_fab, ano_modelo, preco_medio)
 
 def update_vehicle(vehicle_id, model_id, ano_fab, ano_modelo):
     conn = get_connection()

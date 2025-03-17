@@ -1,4 +1,4 @@
-from app.database.config import get_connection
+from database.config import get_connection
 
 def create_stores_table():
     conn = get_connection()

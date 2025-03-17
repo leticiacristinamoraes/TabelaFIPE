@@ -1,4 +1,4 @@
-import psycopg2
+
 from database.config import get_connection
 import sys
 import os
