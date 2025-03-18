@@ -1,4 +1,6 @@
 from datetime import datetime
+import pandas as pd
+import matplotlib.pyplot as plt
 import sys
 import os
 
@@ -56,3 +58,26 @@ def get_ranking_researchers_table():
         cur.close()
         conn.close()
 
+def generate_research_graph(start_date, end_date):
+    """Busca o total de pesquisas por usuário no intervalo de datas informado."""
+    query = """
+        SELECT 
+            u.id AS user_id,
+            u.nome AS user_name,
+            COUNT(p.id) AS total_pesquisas
+        FROM users u
+        LEFT JOIN stores s ON u.id = s.pesquisador_id
+        LEFT JOIN prices p ON s.id = p.loja_id
+        WHERE p.data BETWEEN %s AND %s
+        GROUP BY u.id, u.nome
+        ORDER BY total_pesquisas DESC
+        LIMIT 10;
+    """
+    
+    conn = get_connection()
+    df = pd.read_sql_query(query, conn, params=(start_date, end_date))
+    conn.close()
+    
+    return df
+    
+    
