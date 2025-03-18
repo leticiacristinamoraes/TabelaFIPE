@@ -10,6 +10,8 @@ from app.database.brands import get_brands
 from app.database.models import get_models
 from app.database.vehicles import get_vehicle_years
 from app.database.prices import create_price
+from app.database.users import get_researcher_info
+from app.database.ranking_researchers import create_ranking_researchers_table
 from lib.auth import check_authentication, get_user_store_assignment
 
 st.set_page_config(
@@ -51,6 +53,11 @@ def get_brand_id_by_name(brand_name):
 # Layout do painel do pesquisador
 st.title("Painel do Pesquisador")
 
+#if st.session_state["connected"]:
+    #email = st.session_state['user_info']['email']  # Obtém o email do usuário logado
+    #researcher_name, researcher_email = get_researcher_info(email)
+
+
 # Seleção da loja
 stores = get_stores()
 store_names = [store[1] for store in stores]  # Assume que o nome da loja está na segunda posição da tupla
@@ -84,6 +91,8 @@ if selected_brand:
             store_id = get_store_id_by_name(selected_store)
             if store_id and model_id and selected_year:
                 create_price(model_id, store_id, price)
+                #create_ranking_researchers_table(researcher_name,researcher_email,price)
                 st.success("Preço cadastrado com sucesso!")
+                
             else:
                 st.error("Erro ao cadastrar o preço. Verifique os dados e tente novamente.")
