@@ -1,11 +1,14 @@
+import datetime
 import streamlit as st
 import pandas as pd
 import sys
+
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from app.database.config import get_connection
 from app.database.stores import get_stores, create_store, update_store, delete_store
 from app.database.users import get_users, create_user, update_user, delete_user
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from app.lib.grafico_cotacoes_loja import component_cotacoes_loja
 
 
 st.set_page_config(
@@ -29,7 +32,7 @@ def listar_pesquisadores():
 
 def painel_gestor():
     st.title("Painel do Gestor")
-    aba_cadastro, aba_listagem, aba_pesquisadores, aba_veiculos = st.tabs(["Cadastrar Loja", "Listar Lojas", "Gerenciar Usuários", "Gerenciar Veículos"])
+    aba_cadastro, aba_listagem, aba_pesquisadores, aba_veiculos, aba_grafico_loja  = st.tabs(["Cadastrar Loja", "Listar Lojas", "Gerenciar Usuários", "Gerenciar Veículos", "Cotações por loja"])
 
     with aba_cadastro:
         st.header("Cadastrar Nova Loja")
@@ -38,7 +41,7 @@ def painel_gestor():
         cnpj = st.text_input("CNPJ")
         pesquisadores = listar_pesquisadores()
         pesquisador_opcoes = {p[1]: p[0] for p in pesquisadores}  # {'nome': id}
-        pesquisador_escolhido = st.selectbox("Atribuir a um Pesquisador", ["Nenhum"] + list(pesquisador_opcoes.keys()))
+        pesquisador_escolhido = st.selectbox("Atribuir a um Pesquisador", ["Nenhum"] + list(pesquisador_opcoes.keys()), key='pesquisador_opcoes')
         
         if st.button("Cadastrar Loja"):
             pesquisador_id = pesquisador_opcoes.get(pesquisador_escolhido) if pesquisador_escolhido != "Nenhum" else None
@@ -122,5 +125,7 @@ def painel_gestor():
             st.header("Gerenciar Veículos")
             st.write("Em construção...")
 
+        with aba_grafico_loja:
+            component_cotacoes_loja()
 if __name__ == "__main__":
     painel_gestor()
