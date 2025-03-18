@@ -7,6 +7,7 @@ import time
 import sys
 import pandas as pd
 import psycopg2
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from database.create_tables import create_all_tables
 from database.config import get_connection
 from database.brands import get_brands
@@ -16,7 +17,7 @@ from database.db_populate import populate_database
 from database.vehicles import get_vehicle_years
 from database.average_price import calculate_and_update_average_price
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from app.lib.auth import Authenticator
 
 load_dotenv()
