@@ -1,10 +1,9 @@
-from app.database.config import get_connection
+# Adicione o caminho correto do seu projeto
 import sys
 import os
 
-# Adicione o caminho correto do seu projeto
-sys.path.append(os.path.abspath("app"))
-
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from app.database.config import get_connection
 from app.database.average_price import calculate_and_update_average_price
 
 
