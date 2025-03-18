@@ -30,6 +30,18 @@ st.markdown("""
 st.title("🔍 Pesquisador")
 st.write("Bem vindo de volta Pesquisador. Insira os preços dos carros da loja pesquisada")
 
+# Verificar se o usuário está autenticado
+if "connected" not in st.session_state or not st.session_state["connected"]:
+    st.error("Você precisa estar logado para acessar esta página.")
+    st.stop()  # Para a execução da página
+
+st.title("🔍 Pesquisador")
+st.write(f"Bem-vindo de volta, {st.session_state['user_info']['email']}")
+
+# Pega o ID do usuário logado
+researcher_id = st.session_state["user_info"]["id"]
+st.title(researcher_id)
+
 # Função para obter o ID da loja pelo nome
 def get_store_id_by_name(store_name):
     conn = get_connection()

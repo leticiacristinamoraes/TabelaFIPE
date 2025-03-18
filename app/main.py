@@ -31,7 +31,7 @@ def database_ja_populado():
     return count > 0 
 
 if not database_ja_populado():
-   populate_database()
+    populate_database()
 
 # Função para rodar o agendador
 def rodar_agendador():
