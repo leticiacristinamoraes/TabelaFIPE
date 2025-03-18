@@ -17,6 +17,7 @@ def create_prices_table():
             veiculo_id INTEGER NOT NULL,
             loja_id INTEGER NOT NULL,
             preco NUMERIC(10,2) NOT NULL,
+            data DATE NOT NULL,  -- Adicionando a coluna de data
             FOREIGN KEY (veiculo_id) REFERENCES vehicles(id) ON DELETE CASCADE,
             FOREIGN KEY (loja_id) REFERENCES stores(id) ON DELETE CASCADE
         );
@@ -26,12 +27,12 @@ def create_prices_table():
     cur.close()
     conn.close()
 
-def create_price(veiculo_id, loja_id, preco):
+def create_price(veiculo_id, loja_id, preco, data):
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("""
-        INSERT INTO prices (veiculo_id, loja_id, preco) VALUES (%s, %s, %s) RETURNING id;
-    """, (veiculo_id, loja_id, preco))
+        INSERT INTO prices (veiculo_id, loja_id, preco, data) VALUES (%s, %s, %s, %s) RETURNING id;
+    """, (veiculo_id, loja_id, preco, data))
     price_id = cur.fetchone()[0]
     conn.commit()
     cur.close()
@@ -50,12 +51,12 @@ def get_prices():
     conn.close()
     return prices
 
-def update_price(price_id, veiculo_id, loja_id, preco):
+def update_price(price_id, veiculo_id, loja_id, preco, data):
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("""
-        UPDATE prices SET veiculo_id = %s, loja_id = %s, preco = %s WHERE id = %s;
-    """, (veiculo_id, loja_id, preco, price_id))
+        UPDATE prices SET veiculo_id = %s, loja_id = %s, preco = %s, data = %s WHERE id = %s;
+    """, (veiculo_id, loja_id, preco, data, price_id))
     conn.commit()
     cur.close()
     conn.close()

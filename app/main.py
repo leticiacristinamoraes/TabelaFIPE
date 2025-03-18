@@ -2,7 +2,7 @@ import streamlit as st
 import os
 from dotenv import load_dotenv
 import threading
-import schedule
+#import schedule
 import time
 import sys
 import pandas as pd
@@ -33,22 +33,7 @@ def database_ja_populado():
 if not database_ja_populado():
     populate_database()
 
-# Função para rodar o agendador
-def rodar_agendador():
-    """Executa o agendador em loop para verificar tarefas pendentes."""
-    
-    
-    schedule.every().day.at("03:00").do(calculate_and_update_average_price)  # Define a tarefa para 03:00 AM
 
-    while True:
-        schedule.run_pending()
-        time.sleep(60)  # Espera 60 segundos antes de verificar novamente
-
-# Garantir que o agendador só seja iniciado uma vez
-if "agendador_iniciado" not in st.session_state:
-    st.session_state["agendador_iniciado"] = True  # Marca como iniciado
-    thread = threading.Thread(target=rodar_agendador, daemon=True)
-    thread.start()
 
 st.set_page_config(
     page_title="Tabela Fipe",
@@ -66,6 +51,8 @@ if "user_role" not in st.session_state:  # Adicionando controle de papéis
     st.session_state["user_role"] = None
 if "logout" not in st.session_state:
     st.session_state["logout"] = False
+if "user_id" not in st.session_state:  # Adicionando controle de papéis
+    st.session_state["user_id"] = None
 if "autenticador" not in st.session_state:
     st.session_state["autenticador"] = None
 
@@ -123,6 +110,7 @@ if st.session_state["connected"]:
     for user in users:
             if user[2] == email:  # user[2] é o campo "email" na tupla
                 st.session_state.user_role = user[3]
+                st.session_state.user_id = user[0]
     
    #
     gestor, pesquisador = st.columns(2)

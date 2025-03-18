@@ -4,8 +4,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+from datetime import date
 from app.database.config import get_connection
-from app.database.stores import get_stores
+from app.database.stores import get_stores, get_stores_by_researcher
 from app.database.brands import get_brands
 from app.database.models import get_models
 from app.database.vehicles import get_vehicle_years
@@ -27,20 +28,17 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🔍 Pesquisador")
-st.write("Bem vindo de volta Pesquisador. Insira os preços dos carros da loja pesquisada")
-
 # Verificar se o usuário está autenticado
 if "connected" not in st.session_state or not st.session_state["connected"]:
     st.error("Você precisa estar logado para acessar esta página.")
     st.stop()  # Para a execução da página
 
 st.title("🔍 Pesquisador")
-st.write(f"Bem-vindo de volta, {st.session_state['user_info']['email']}")
+st.write(f"Bem-vindo de volta, {st.session_state['user_info']['email']}. Insira os preços dos carros da loja pesquisada")
 
 # Pega o ID do usuário logado
-researcher_id = st.session_state["user_info"]["id"]
-st.title(researcher_id)
+researcher_id = st.session_state["user_id"]
+#st.title(researcher_id)
 
 # Função para obter o ID da loja pelo nome
 def get_store_id_by_name(store_name):
@@ -71,7 +69,8 @@ st.title("Painel do Pesquisador")
 
 
 # Seleção da loja
-stores = get_stores()
+stores = get_stores_by_researcher(researcher_id)
+#stores = get_stores()
 store_names = [store[1] for store in stores]  # Assume que o nome da loja está na segunda posição da tupla
 selected_store = st.selectbox("Selecione a loja", store_names)
 
@@ -98,11 +97,13 @@ if selected_brand:
         # Campo para inserir o preço
         price = st.number_input("Informe o preço", min_value=0.0, format="%.2f")
 
+        selected_date = st.date_input("Selecione a data", value=date.today())
+
         # Botão para salvar o preço
         if st.button("Salvar Preço"):
             store_id = get_store_id_by_name(selected_store)
-            if store_id and model_id and selected_year:
-                create_price(model_id, store_id, price)
+            if store_id and model_id and selected_year and selected_date:
+                create_price(model_id, store_id, price, selected_date)
                 #create_ranking_researchers_table(researcher_name,researcher_email,price)
                 st.success("Preço cadastrado com sucesso!")
                 
