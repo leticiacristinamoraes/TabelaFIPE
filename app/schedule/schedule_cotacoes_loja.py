@@ -1,6 +1,6 @@
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.append(os.path.abspath("app"))
 
 import datetime
 import time
@@ -36,15 +36,13 @@ def task_cotacoes_loja(new_date_start: datetime.date,new_date_final:datetime.dat
 
 def start_task_cotacoes_loja():
     date_now = datetime.datetime.now()
-    _, last_day = calendar.monthrange(date_now.year, date_now.month)
+    _, last_day = calendar.monthrange(2025, 2)
     
-    result = task_cotacoes_loja(new_date_start=datetime.date(date_now.year,date_now.month,1), new_date_final=datetime.date(date_now.year,date_now.month,last_day))
+    result = task_cotacoes_loja(new_date_start=datetime.date(2025,2,1), new_date_final=datetime.date(2025,2,last_day))
     if result is not None:
         return result
     return None
-if __name__ == "__main__":
-    try:
-        result = start_task_cotacoes_loja()
-    except:
-         print("ERRO")
+
+    
+
     
