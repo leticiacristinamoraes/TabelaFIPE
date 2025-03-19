@@ -38,6 +38,6 @@ def component_cotacoes_loja():
 
         st.dataframe(chart_data, column_config=config)
         monthly = chart_data['total'].resample('ME').mean()
-       
+        
         st.line_chart(monthly)
         

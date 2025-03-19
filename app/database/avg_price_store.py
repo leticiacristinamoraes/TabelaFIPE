@@ -26,14 +26,14 @@ def create_prices_store_table():
     cur.close()
     conn.close()
 
-def create_price_store(loja_id, new_cotacao_total, data):
+def create_price_store(store_id, new_total, date):
     conn = get_connection()
     cur = conn.cursor()
     
     cur.execute('''
         INSERT INTO "month_price_stores" (loja_id, cotacao_total, data) 
         VALUES ( %s, %s, %s);
-    ''', (loja_id, new_cotacao_total, data))
+    ''', (store_id, new_total, date))
     
     conn.commit()
     cur.close()
@@ -105,4 +105,6 @@ def get_cotations_count_by_month(store_id: int, date_start: datetime, date_final
     print(cotations)
     cur.close()
     conn.close()
-    return {'total': cotations[0], 'year': int(cotations[1]), 'month': int(cotations[2])}
+    if cotations is not None:
+        return {'total': cotations[0], 'year': int(cotations[1]), 'month': int(cotations[2])}
+    return None
