@@ -5,7 +5,7 @@ from database.stores import create_stores_table
 from database.vehicles import create_vehicles_table
 from database.prices import create_prices_table
 from database.average_price import create_average_price_table
-from database.ranking_researchers import create_ranking_researchers_table, get_ranking_researchers_table
+from database.ranking_researchers import create_ranking_researchers_table, update_ranking_researchers_table
 
 def create_all_tables():
     create_users_table()
@@ -16,7 +16,7 @@ def create_all_tables():
     create_prices_table()
     create_average_price_table()
     create_ranking_researchers_table()
-    get_ranking_researchers_table()
+    update_ranking_researchers_table()
 
     print("Todas as tabelas foram criadas com sucesso!")
 

@@ -1,6 +1,5 @@
 from datetime import datetime
 import pandas as pd
-import matplotlib.pyplot as plt
 import sys
 import os
 
@@ -23,7 +22,7 @@ def create_ranking_researchers_table():
     cur.close()
     conn.close()
     
-def get_ranking_researchers_table():
+def update_ranking_researchers_table():
     """
     Insere ou atualiza a tabela ranking_researchers com a quantidade total pesquisa.
     """
@@ -49,10 +48,36 @@ def get_ranking_researchers_table():
         """)
         
         conn.commit()
+        
         return True
     except Exception as e:
         conn.rollback()
         print(f"Erro ao inserir pesquisador no ranking: {e}")
+        return False
+    finally:
+        cur.close()
+        conn.close()
+
+def get_ranking_researchers_table():
+    """
+    consultar a tabela ranking_researchers com a quantidade total pesquisa.
+    """
+    conn = get_connection()
+    cur = conn.cursor()
+    
+    try:
+        cur.execute("""
+            SELECT user_name, total_pesquisa
+            FROM ranking_researchers
+            ORDER BY total_pesquisa DESC;
+        """)
+        resultados = cur.fetchall()
+        resul = pd.DataFrame(resultados, columns=["user_name", "total_pesquisa"])
+        resul.rename(columns={"user_name": "Nome do Pesquisador", "total_pesquisa": "Total de Pesquisa"}, inplace=True)
+        return resul
+    except Exception as e:
+        conn.rollback()
+        print(f"Erro ao consultar ranking: {e}")
         return False
     finally:
         cur.close()
