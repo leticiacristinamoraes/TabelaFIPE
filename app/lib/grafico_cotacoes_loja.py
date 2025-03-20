@@ -3,7 +3,7 @@ import streamlit as st
 import pandas as pd
 
 from database.stores import get_stores
-from database.avg_price_store import get_cotation_by_data
+from database.month_cotation_store import get_cotation_by_data
 
 
 
@@ -13,8 +13,7 @@ def get_cotations_list(store_id,date_start, date_final):
     return cotations_list
 
 def component_cotacoes_loja():
-    st.header("COtações por loja")
-    st.write("em construção....")
+    st.header("Cotações por loja")
     stores = get_stores()
     stores_options = {s[1]: s[0] for s in stores}  # {'nome': id}
     selected_store = st.selectbox("Selecionar loja para a pesquisa", ["Nenhum"] + list(stores_options.keys()), key='stores_options')
