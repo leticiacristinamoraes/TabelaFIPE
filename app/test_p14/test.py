@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 
+
 def get_default_edge_options():
     options = webdriver.ChromeOptions()
     options.add_argument("--no-sandbox")
@@ -54,7 +55,8 @@ for i, (data_inicial, data_final) in enumerate(datas_teste, start=1):
         # Clicar no botão
         button_ranking = driver.find_element(By.CSS_SELECTOR, "div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(3) > div:nth-child(1) > button:nth-child(1)")
         button_ranking.click()
-        
+
+
         time.sleep(10)
         print(f"Teste {i} - Data Inicial: {data_inicial}, Data Final: {data_final}: APROVADO ✅")
 
