@@ -5,3 +5,4 @@
 .env
 client_secret.json
 .streamlit/secrets.toml
+tarefa_agendada.py

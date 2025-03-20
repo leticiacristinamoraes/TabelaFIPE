@@ -131,13 +131,17 @@ def painel_gestor():
         # Input de Data Inicial e Final
         col1, col2 = st.columns(2)
         with col1:
-            start_date = st.date_input("Selecione a Data Inicial", value=date.today())
+            start_date = st.date_input("Selecione a Data Inicial", value=None)
         with col2:
-            end_date = st.date_input("Selecione a Data Final", value=date.today())
+            end_date = st.date_input("Selecione a Data Final", value=None, min_value=start_date if start_date else None)
 
         # Botão para gerar gráfico
         if st.button("Gerar Gráfico"):
-            if start_date and end_date:
+            if not start_date or not end_date:
+                st.warning("Por favor, selecione um intervalo de datas válido.")
+            elif end_date < start_date:
+                st.error("A Data Final não pode ser anterior à Data Inicial.")
+            elif start_date and end_date:
                 df = generate_research_graph(start_date, end_date)
 
                 if df.empty:
