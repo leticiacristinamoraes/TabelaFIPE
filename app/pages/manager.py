@@ -2,10 +2,12 @@ import streamlit as st
 import pandas as pd
 import sys
 import os
+import matplotlib.pyplot as plt
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from app.database.config import get_connection
 from app.database.stores import get_stores, create_store, update_store, delete_store
 from app.database.users import get_users, create_user, update_user, delete_user
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from app.database.prices import count_inputs_researcher
 
 
 st.set_page_config(
@@ -29,7 +31,7 @@ def listar_pesquisadores():
 
 def painel_gestor():
     st.title("Painel do Gestor")
-    aba_cadastro, aba_listagem, aba_pesquisadores, aba_veiculos = st.tabs(["Cadastrar Loja", "Listar Lojas", "Gerenciar Usuários", "Gerenciar Veículos"])
+    aba_cadastro, aba_listagem, aba_pesquisadores, aba_veiculos, aba_metricas_pesquisadores = st.tabs(["Cadastrar Loja", "Listar Lojas", "Gerenciar Usuários", "Gerenciar Veículos","Metricas dos Pesquisadores"])
 
     with aba_cadastro:
         st.header("Cadastrar Nova Loja")
@@ -121,6 +123,28 @@ def painel_gestor():
         with aba_veiculos:
             st.header("Gerenciar Veículos")
             st.write("Em construção...")
-
+#                   >>>>>>>>>>> Funcionalidade P12/1 <<<<<<<<<<<<
+        with aba_metricas_pesquisadores:
+            st.header("Métricas dos pesquisadores")
+            pesquisadores2 = listar_pesquisadores()
+            pesquisador_opcoes2 = {p[1]: p[0] for p in pesquisadores2}  # {'nome': id}
+            pesquisador_escolhido2 = st.selectbox("Pesquisador", ["Nome do pesquisador"] + list(pesquisador_opcoes2.keys()), key="nome_pesquisador")
+            pesquisador_id2 = pesquisador_opcoes2.get(pesquisador_escolhido2) if pesquisador_escolhido2 != "Nenhum" else None
+            data_inicial = st.date_input("Data Inicial", format="YYYY-MM-DD",key="data_inicial")
+            data_final = st.date_input("Data final",min_value= data_inicial,format="YYYY-MM-DD",key="data_final")
+            data_inicial = data_inicial.strftime("%Y-%m-%d")
+            data_final = data_final.strftime("%Y-%m-%d")
+            
+            if st.button("Buscar", key="buscar_pesquisador"):
+                tabela = count_inputs_researcher(pesquisador_id2, data_inicial, data_final)
+                df = pd.DataFrame(tabela, columns=['Data', 'Quantidade'])
+                # fig, ax = plt.subplots(figsize=(8,6))
+                # df.plot(x='Data', y='Quantidade', kind='bar',ax=ax)
+                # ax.set_frame_on(False)
+                # #adicionando um título
+                # ax.set_title(f"Quantidade de cotações no mês do(a) pesquisador(a) {pesquisador_escolhido2}",loc='left',pad=30,fontdict={'fontsize':20},color='#3f3f4e')
+                # st.pyplot(fig)
+                st.bar_chart(df.set_index('Data'))
+        
 if __name__ == "__main__":
     painel_gestor()

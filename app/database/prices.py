@@ -1,11 +1,12 @@
 import sys
 import os
+sys.path.append(os.path.abspath("app"))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from app.database.config import get_connection
 import os
 import psycopg2
 
-sys.path.append(os.path.abspath("app"))
+
 from app.database.average_price import calculate_and_update_average_price
 
 def create_prices_table():
@@ -108,3 +109,25 @@ def delete_price(price_id, veiculo_id):
     conn.close()
     
     calculate_and_update_average_price(veiculo_id)
+
+def count_inputs_researcher(researcher_id, start_date, end_date):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT data,
+		COUNT(*) AS cotacoes
+FROM (SELECT * FROM (SELECT
+	prices.loja_id,
+	prices.data,
+	stores.pesquisador_id
+FROM prices
+	INNER JOIN stores ON prices.loja_id = stores.id) T 
+		WHERE loja_id IN (SELECT id FROM stores WHERE pesquisador_id = {} ) 
+		AND data BETWEEN '{}' AND '{}') R
+GROUP BY data;
+
+    """.format(researcher_id, start_date, end_date))
+    stores_per_researcher = cur.fetchall()
+    cur.close()
+    conn.close()
+    return stores_per_researcher
