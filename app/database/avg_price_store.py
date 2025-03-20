@@ -3,7 +3,7 @@ import sys
 import os
 
 # Adicione o caminho correto do seu projeto
-sys.path.append(os.path.abspath("app"))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from database.config import get_connection
 
@@ -18,8 +18,9 @@ def create_prices_store_table():
             loja_id INTEGER NOT NULL,
             cotacao_total NUMERIC(10,2) NOT NULL,
             data DATE NOT NULL, -- Adicionando a coluna de data
-            FOREIGN KEY (loja_id) REFERENCES stores(id) ON DELETE CASCADE
-        );
+            FOREIGN KEY (loja_id) REFERENCES stores(id) ON DELETE CASCADE,
+            UNIQUE(loja_id, data)
+                );
     """)
     
     conn.commit()
@@ -55,6 +56,7 @@ def get_total_prices_store():
 def get_cotation_by_data(store_id, date_start, date_final):
     conn = get_connection()
     cur = conn.cursor()
+    
     cur.execute('''SELECT cotacao_total, data  FROM "month_price_stores" WHERE loja_id=%s AND "data" BETWEEN %s AND %s GROUP BY "cotacao_total","data";''', (store_id, date_start,date_final))
     cotations = cur.fetchall()
     print(cotations)

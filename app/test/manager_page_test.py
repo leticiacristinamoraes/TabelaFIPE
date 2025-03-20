@@ -35,17 +35,17 @@ time.sleep(3)
 
 date_field_inicial = driver.find_element(By.CLASS_NAME, 'st-key-data-inicial')
 date_inicial = date_field_inicial.find_element(By.TAG_NAME, 'input')
-date_inicial.send_keys("2024/12/01")
+date_inicial.send_keys("2025/01/01")
 date_inicial.send_keys(Keys.ENTER)
 time.sleep(3)
 
 date_field_final = driver.find_element(By.CLASS_NAME, 'st-key-data-final')
 date_final = date_field_final.find_element(By.TAG_NAME, 'input')
-date_final.send_keys("2025/01/31")
+date_final.send_keys("2025/03/31")
 date_final.send_keys(Keys.ENTER)
 time.sleep(3)
-
 
 button_cotacoes = driver.find_element(By.CLASS_NAME, "st-key-button-cotacoes")
 button_cotacoes.find_element(By.TAG_NAME, 'button').click()
 time.sleep(1000)
+

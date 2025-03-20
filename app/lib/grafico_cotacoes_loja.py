@@ -7,11 +7,11 @@ from database.avg_price_store import get_cotation_by_data
 
 
 
-def get_prices_by_store_id(store_id):
-    pass
+
 def get_cotations_list(store_id,date_start, date_final):
     cotations_list = get_cotation_by_data(store_id,date_start,date_final)
     return cotations_list
+
 def component_cotacoes_loja():
     st.header("COtações por loja")
     st.write("em construção....")
@@ -24,20 +24,13 @@ def component_cotacoes_loja():
 
     if st.button("Pesquisar cotações", key="button-cotacoes"):
         cotation_list = get_cotations_list(stores_options[selected_store], date_inicial_str,date_final_str)
-        cotation_dict = {'data':[datetime.datetime(p.year,p.month,1) for p in cotation_list.keys()],
+        cotation_dict = {'data':[f'{p.month}/{p.year}' for p in cotation_list.keys()],
                          'total':[int(p) for p in cotation_list.values()]}
         print(cotation_dict)
-        chart_data = pd.DataFrame(cotation_dict)
-        chart_data['data'] = pd.to_datetime(chart_data['data'],  format="%Y-%m")
-        
-        chart_data.set_index('data', inplace=True)
-        config = {
-            "_index": st.column_config.DateColumn("Month", format="MMM YYYY"),
-            "Total": st.column_config.NumberColumn("Total ($)"),
-        }
 
-        st.dataframe(chart_data, column_config=config)
-        monthly = chart_data['total'].resample('ME').mean()
+        chart_data = pd.DataFrame(cotation_dict)
+        chart_data = chart_data.set_index('data')
+        st.dataframe(chart_data)
         
-        st.line_chart(monthly)
+        st.line_chart(chart_data)
         
