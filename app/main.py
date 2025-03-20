@@ -68,7 +68,7 @@ authenticator = Authenticator(
     secret_path="client_secret.json",
     redirect_uri="http://localhost:8501",
 )
-
+authenticator.check_auth()
 # Creating a layout with columns to position the button in the top right corner
 col1, col2 = st.columns([8, 2]) 
 
@@ -80,7 +80,7 @@ with col1:
 with col2:
     st.markdown("<div style='text-align: right;'>", unsafe_allow_html=True)
     if not st.session_state["connected"]:   
-        authenticator.check_auth()
+        #authenticator.check_auth()
         authenticator.login()
             
     else:
