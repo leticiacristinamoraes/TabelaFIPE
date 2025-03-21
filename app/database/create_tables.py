@@ -7,6 +7,10 @@ from database.prices import create_prices_table
 from database.average_price import create_average_price_table
 from database.ranking_researchers import create_ranking_researchers_table
 
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
 def create_all_tables():
     create_users_table()
     create_brands_table()

@@ -1,11 +1,11 @@
 # Adicione o caminho correto do seu projeto
 import sys
 import os
+import psycopg2
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-from app.database.config import get_connection
+sys.path.append(os.path.abspath("app"))
 from app.database.average_price import calculate_and_update_average_price
-
+from database.config import get_connection
 
 def create_prices_table():
     conn = get_connection()
@@ -30,9 +30,12 @@ def create_prices_table():
 def create_price(veiculo_id, loja_id, preco, data):
     conn = get_connection()
     cur = conn.cursor()
+    
     cur.execute("""
-        INSERT INTO prices (veiculo_id, loja_id, preco, data) VALUES (%s, %s, %s, %s) RETURNING id;
+        INSERT INTO prices (veiculo_id, loja_id, preco, data) 
+        VALUES (%s, %s, %s, %s) RETURNING id;
     """, (veiculo_id, loja_id, preco, data))
+    
     price_id = cur.fetchone()[0]
     conn.commit()
     cur.close()
@@ -55,7 +58,8 @@ def update_price(price_id, veiculo_id, loja_id, preco, data):
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("""
-        UPDATE prices SET veiculo_id = %s, loja_id = %s, preco = %s, data = %s WHERE id = %s;
+        UPDATE prices SET veiculo_id = %s, loja_id = %s, preco = %s, data = %s 
+        WHERE id = %s;
     """, (veiculo_id, loja_id, preco, data, price_id))
     conn.commit()
     cur.close()
@@ -63,30 +67,24 @@ def update_price(price_id, veiculo_id, loja_id, preco, data):
     
     calculate_and_update_average_price(veiculo_id)
 
-import psycopg2
-from database.config import get_connection
-
 def calcular_e_atualizar_media(veiculo_id):
     """Calcula a média dos preços de um veículo e armazena na tabela average_price."""
 
     conn = get_connection()
     cur = conn.cursor()
 
-    # 1. Buscar todos os preços do veículo na tabela 'prices'
     cur.execute("""
-        SELECT price FROM prices WHERE veiculo_id = %s
+        SELECT preco FROM prices WHERE veiculo_id = %s
     """, (veiculo_id,))
     
-    precos = cur.fetchall()  # Retorna uma lista de tuplas [(preco1,), (preco2,), ...]
+    precos = cur.fetchall()  
     
-    if not precos:  # Se não houver preços cadastrados
+    if not precos:  
         print(f"Nenhum preço encontrado para o veículo {veiculo_id}")
         return
     
-    # 2. Calcular a média dos preços
     media_preco = round(sum(p[0] for p in precos) / len(precos), 2)
 
-    # 3. Atualizar ou inserir a média na tabela 'average_price'
     cur.execute("""
         INSERT INTO average_price (veiculo_id, average_price)
         VALUES (%s, %s)
