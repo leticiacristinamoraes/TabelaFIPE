@@ -1,4 +1,8 @@
-from app.database.config import get_connection
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
+from database.config import get_connection
 
 def create_users_table():
     conn = get_connection()
@@ -71,3 +75,27 @@ def delete_user(user_id):
     conn.commit()
     cur.close()
     conn.close()
+
+
+def get_researcher_info(email):
+    """Retorna o nome e email do pesquisador logado."""
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT nome, email
+        FROM users
+        WHERE email = %s
+        """,
+        (email,),
+    )
+    result = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    if result:
+        return result
+    else:
+        return None, None
+    
+

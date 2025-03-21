@@ -12,6 +12,7 @@ dependencies = [
     "psycopg[binary]>=3.2.5",
     "pyjwt==2.9.0",
     "python-dotenv==1.0.1",
+    "schedule>=1.2.2",
     "sqlalchemy[asyncio]>=2.0.39",
     "streamlit>=1.43.1",
 ]

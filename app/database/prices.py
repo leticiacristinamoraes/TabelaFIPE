@@ -1,10 +1,11 @@
-from app.database.config import get_connection
+# Adicione o caminho correto do seu projeto
 import sys
 import os
 import psycopg2
 
 sys.path.append(os.path.abspath("app"))
 from app.database.average_price import calculate_and_update_average_price
+from database.config import get_connection
 
 def create_prices_table():
     conn = get_connection()
