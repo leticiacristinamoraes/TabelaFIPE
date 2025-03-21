@@ -2,11 +2,12 @@ import streamlit as st
 import pandas as pd
 import sys
 import os
+from app.database.dezess import mostrar_top_10_grafico
 from app.database.config import get_connection
 from app.database.stores import get_stores, create_store, update_store, delete_store
 from app.database.users import get_users, create_user, update_user, delete_user
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
+import matplotlib.pyplot as plt
 
 st.set_page_config(
     page_title="Gestor",
@@ -22,14 +23,15 @@ st.markdown("""
 
 st.title("👨‍💼 Pagina do Gestor")
 st.write("Bem vindo à página, acesse a lista de pesquisadores, lojas e gerencie usuários")
-
+if st.button("Voltar para a Home"):
+   st.switch_page("main.py")
 def listar_pesquisadores():
     """Busca pesquisadores cadastrados."""
     return [(user[0], user[1]) for user in get_users() if user[3] == 'pesquisador']
 
 def painel_gestor():
     st.title("Painel do Gestor")
-    aba_cadastro, aba_listagem, aba_pesquisadores, aba_veiculos = st.tabs(["Cadastrar Loja", "Listar Lojas", "Gerenciar Usuários", "Gerenciar Veículos"])
+    aba_cadastro, aba_listagem, aba_pesquisadores, aba_veiculos, aba_Topdezmensal = st.tabs(["Cadastrar Loja", "Listar Lojas", "Gerenciar Usuários", "Gerenciar Veículos", "Produtividade Mensal"])
 
     with aba_cadastro:
         st.header("Cadastrar Nova Loja")
@@ -121,6 +123,13 @@ def painel_gestor():
         with aba_veiculos:
             st.header("Gerenciar Veículos")
             st.write("Em construção...")
+    with aba_Topdezmensal:           
+        
+        
+        mostrar_top_10_grafico()
+
+
+
 
 if __name__ == "__main__":
     painel_gestor()

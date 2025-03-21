@@ -1,4 +1,4 @@
-from app.database.config import get_connection
+from database.config import get_connection
 
 def create_stores_table():
     conn = get_connection()
@@ -39,7 +39,18 @@ def get_stores():
     cur.close()
     conn.close()
     return stores if stores else []
-
+def get_stores_by_researcher(pesquisador_id):
+     """Retorna apenas as lojas associadas a um determinado pesquisador."""
+     conn = get_connection()
+     cur = conn.cursor()
+     cur.execute(
+         "SELECT id, nome, endereco, cnpj FROM stores WHERE pesquisador_id = %s;", 
+         (pesquisador_id,)
+     )
+     stores = cur.fetchall()
+     cur.close()
+     conn.close()
+     return stores if stores else []
 def update_store(store_id, nome, endereco, cnpj, pesquisador_id):
     conn = get_connection()
     cur = conn.cursor()

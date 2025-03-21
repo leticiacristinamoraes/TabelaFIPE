@@ -4,14 +4,15 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-from app.database.config import get_connection
-from app.database.stores import get_stores
-from app.database.brands import get_brands
-from app.database.models import get_models
-from app.database.vehicles import get_vehicle_years
-from app.database.prices import create_price
+from datetime import date
+from database.config import get_connection
+from database.stores import get_stores
+from database.brands import get_brands
+from database.models import get_models
+from database.vehicles import get_vehicle_years
+from database.prices import create_price
 from lib.auth import check_authentication, get_user_store_assignment
-
+from database.stores import get_stores, get_stores_by_researcher
 st.set_page_config(
     page_title="Pagina de Pesquisador",
     page_icon="🔍",
@@ -27,7 +28,9 @@ st.markdown("""
 
 st.title("🔍 Pesquisador")
 st.write("Bem vindo de volta Pesquisador. Insira os preços dos carros da loja pesquisada")
-
+if st.button("Voltar para a Home"):
+   st.switch_page("main.py")
+researcher_id = st.session_state["user_id"]
 # Função para obter o ID da loja pelo nome
 def get_store_id_by_name(store_name):
     conn = get_connection()
@@ -52,7 +55,7 @@ def get_brand_id_by_name(brand_name):
 st.title("Painel do Pesquisador")
 
 # Seleção da loja
-stores = get_stores()
+stores = get_stores_by_researcher(researcher_id)
 store_names = [store[1] for store in stores]  # Assume que o nome da loja está na segunda posição da tupla
 selected_store = st.selectbox("Selecione a loja", store_names)
 
@@ -75,15 +78,18 @@ if selected_brand:
         
         # Seleção do ano do modelo
         selected_year = st.selectbox("Selecione o ano do modelo", years)
+        
 
         # Campo para inserir o preço
         price = st.number_input("Informe o preço", min_value=0.0, format="%.2f")
-
+        selected_date = st.date_input("Selecione a data", value=date.today())
+        
+        
         # Botão para salvar o preço
         if st.button("Salvar Preço"):
             store_id = get_store_id_by_name(selected_store)
-            if store_id and model_id and selected_year:
-                create_price(model_id, store_id, price)
+            if store_id and model_id and selected_year and selected_date:
+                create_price(model_id, store_id, price, selected_date)
                 st.success("Preço cadastrado com sucesso!")
             else:
                 st.error("Erro ao cadastrar o preço. Verifique os dados e tente novamente.")

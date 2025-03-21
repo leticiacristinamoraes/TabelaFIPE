@@ -66,6 +66,8 @@ if "user_role" not in st.session_state:  # Adicionando controle de papéis
     st.session_state["user_role"] = None
 if "logout" not in st.session_state:
     st.session_state["logout"] = False
+if "user_id" not in st.session_state:  # Adicionando controle de papéis
+     st.session_state["user_id"] = None
 if "autenticador" not in st.session_state:
     st.session_state["autenticador"] = None
 
@@ -123,6 +125,7 @@ if st.session_state["connected"]:
     for user in users:
             if user[2] == email:  # user[2] é o campo "email" na tupla
                 st.session_state.user_role = user[3]
+                st.session_state.user_id = user[0]
     
    #
     gestor, pesquisador = st.columns(2)
