@@ -2,6 +2,7 @@ import psycopg2
 from database.config import get_connection
 import sys
 import os
+from datetime import datetime
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from database.config import get_connection
@@ -25,7 +26,7 @@ def insert_brands():
     conn = get_connection()
     cur = conn.cursor()
     
-    brands = ["Ford", "Chevrolet", "Toyota", "Honda", "Volkswagen"]
+    brands = ["Ford", "Chevrolet", "Toyota", "Honda", "Volkswagen", "Hyundai", "Nissan", "Fiat", "Renault", "Jeep"]
     query = "INSERT INTO brands (nome) VALUES (%s) ON CONFLICT (nome) DO NOTHING RETURNING id;"
     
     for brand in brands:
@@ -46,9 +47,16 @@ def insert_models():
     cur = conn.cursor()
     
     models = [
-        (1, "Fiesta"), (1, "Focus"), (2, "Onix"), (2, "Prisma"),
-        (3, "Corolla"), (3, "Hilux"), (4, "Civic"), (4, "Fit"),
-        (5, "Golf"), (5, "Polo")
+        (1, "Fiesta"), (1, "Focus"), (1, "Ka"), (1, "EcoSport"), (1, "Ranger"),
+        (2, "Onix"), (2, "Prisma"), (2, "S10"), (2, "Spin"), (2, "Cruze"),
+        (3, "Corolla"), (3, "Hilux"), (3, "Yaris"), (3, "SW4"), (3, "RAV4"),
+        (4, "Civic"), (4, "Fit"), (4, "HR-V"), (4, "City"), (4, "Accord"),
+        (5, "Golf"), (5, "Polo"), (5, "Jetta"), (5, "T-Cross"), (5, "Tiguan"),
+        (6, "HB20"), (6, "Creta"), (6, "Tucson"), (6, "Santa Fe"), (6, "Kona"),
+        (7, "March"), (7, "Versa"), (7, "Sentra"), (7, "Frontier"), (7, "Kicks"),
+        (8, "Uno"), (8, "Mobi"), (8, "Argo"), (8, "Toro"), (8, "Cronos"),
+        (9, "Kwid"), (9, "Sandero"), (9, "Logan"), (9, "Duster"), (9, "Captur"),
+        (10, "Renegade"), (10, "Compass"), (10, "Commander"), (10, "Cherokee"), (10, "Wrangler")
     ]
     
     query = """
@@ -74,12 +82,10 @@ def insert_vehicles():
     conn = get_connection()
     cur = conn.cursor()
     
-    vehicles = [
-        (1, 2018, 2019), (2, 2020, 2021), (3, 2019, 2020),
-        (4, 2021, 2022), (5, 2022, 2023), (6, 2017, 2018),
-        (7, 2015, 2016), (8, 2019, 2020), (9, 2020, 2021),
-        (10, 2018, 2019)
-    ]
+    vehicles = []
+    for model_id in range(1, 51):  # Adicionando mais modelos
+        for ano_fab in range(2015, 2024):
+            vehicles.append((model_id, ano_fab, ano_fab + 1))
     
     query = """
         INSERT INTO vehicles (model_id, ano_fab, ano_modelo) 
@@ -104,7 +110,6 @@ def insert_stores():
     conn = get_connection()
     cur = conn.cursor()
     
-    # Obtendo um ID de pesquisador válido
     cur.execute("SELECT id FROM users WHERE papel = 'pesquisador' LIMIT 1;")
     pesquisador = cur.fetchone()
     
@@ -120,8 +125,16 @@ def insert_stores():
         pesquisador_id = pesquisador[0]
 
     stores = [
-        ("AutoCar", "Rua 1", "00.000.000/0001-00", pesquisador_id),
-        ("SuperCarros", "Rua 2", "11.111.111/0001-11", pesquisador_id)
+        ("AutoCar", "Avenida Brasil, 123", "00.000.000/0001-00", pesquisador_id),
+        ("SuperCarros", "Rua das Flores, 456", "11.111.111/0001-11", pesquisador_id),
+        ("Top Veículos", "Alameda Santos, 789", "22.222.222/0001-22", pesquisador_id),
+        ("Prime Motors", "Estrada do Sol, 321", "33.333.333/0001-33", pesquisador_id),
+        ("Elite Cars", "Rodovia Central, 654", "44.444.444/0001-44", pesquisador_id),
+        ("Lux Auto", "Avenida Paulista, 987", "55.555.555/0001-55", pesquisador_id),
+        ("Speed Veículos", "Rua XV de Novembro, 258", "66.666.666/0001-66", pesquisador_id),
+        ("Auto Fácil", "Praça das Nações, 753", "77.777.777/0001-77", pesquisador_id),
+        ("Master Motors", "Boulevard Shopping, 159", "88.888.888/0001-88", pesquisador_id),
+        ("City Cars", "Avenida Independência, 357", "99.999.999/0001-99", pesquisador_id)
     ]
     
     query = """
@@ -131,8 +144,7 @@ def insert_stores():
         nome = EXCLUDED.nome,
         endereco = EXCLUDED.endereco,
         pesquisador_id = EXCLUDED.pesquisador_id;
-"""
-
+    """
     
     for store in stores:
         print(f"Inserindo loja: {store}")
@@ -149,10 +161,11 @@ def insert_users():
     cur = conn.cursor()
     
     users = [
-        ("Alice", "alice@email.com", "pesquisador"),
-        ("Bob", "bob@email.com", "pesquisador"),
-        ("Carlos", "carlos@email.com", "gestor"),
-        ("Diana", "diana@email.com", "gestor"),
+        ("Cristina", "lleehmoraes@gmail.com", "pesquisador"),
+        ("Letícia", "leticiacristinafmds@gmail.com", "gestor"),
+        ("Juca", "usuariodetestetestando@gmail.com", "pesquisador"),
+        ("França", "leehcristinna@gmail.com", "gestor"),
+        ("Hilario", "hilarioglobo2025@gmail.com", "pesquisador")
         
     ]
     
@@ -173,31 +186,28 @@ def insert_prices():
     conn = get_connection()
     cur = conn.cursor()
 
-    # Buscar IDs reais das lojas
     cur.execute("SELECT id FROM stores;")
     store_ids = [row[0] for row in cur.fetchall()]
 
-    # Buscar IDs reais dos veículos
     cur.execute("SELECT id FROM vehicles;")
     vehicle_ids = [row[0] for row in cur.fetchall()]
 
-    # Se não houver lojas ou veículos, não há o que inserir
     if not store_ids or not vehicle_ids:
         print("⚠ Nenhuma loja ou veículo encontrado. Nenhum preço inserido.")
         cur.close()
         conn.close()
         return
 
-    # Criar preços associando IDs reais
     prices = []
     for i, vehicle_id in enumerate(vehicle_ids):
-        store_id = store_ids[i % len(store_ids)]  # Distribui os preços entre as lojas
-        price = 45000 + (i * 1000)  # Gera preços fictícios
-        prices.append((store_id, vehicle_id, price))
+        store_id = store_ids[i % len(store_ids)]
+        price = 45000 + (i * 500)  
+        data_cotacao = datetime.now().date()  
+        prices.append((store_id, vehicle_id, price, data_cotacao))
 
     query = """
-    INSERT INTO prices (loja_id, veiculo_id, preco) 
-    VALUES (%s, %s, %s) 
+    INSERT INTO prices (loja_id, veiculo_id, preco, data_cotacao) 
+    VALUES (%s, %s, %s, %s) 
     ON CONFLICT DO NOTHING;
     """
 

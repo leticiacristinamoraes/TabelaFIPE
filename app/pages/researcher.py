@@ -28,6 +28,9 @@ st.markdown("""
 st.title("🔍 Pesquisador")
 st.write("Bem vindo de volta Pesquisador. Insira os preços dos carros da loja pesquisada")
 
+if st.button("Voltar para a Home"):
+   st.switch_page("main.py")
+
 # Função para obter o ID da loja pelo nome
 def get_store_id_by_name(store_name):
     conn = get_connection()
@@ -78,12 +81,17 @@ if selected_brand:
 
         # Campo para inserir o preço
         price = st.number_input("Informe o preço", min_value=0.0, format="%.2f")
+        
+        # Campo para inserir a data da pesquisa
+        research_date = st.date_input("Selecione a data da pesquisa", datetime.today().date())
 
-        # Botão para salvar o preço
+# Botão para salvar o preço
         if st.button("Salvar Preço"):
             store_id = get_store_id_by_name(selected_store)
             if store_id and model_id and selected_year:
-                create_price(model_id, store_id, price)
+                data_cotacao = research_date.strftime('%Y-%m-%d')  # Converte para string correta
+                create_price(model_id, store_id, price, data_cotacao)
                 st.success("Preço cadastrado com sucesso!")
             else:
                 st.error("Erro ao cadastrar o preço. Verifique os dados e tente novamente.")
+
