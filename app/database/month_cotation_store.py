@@ -1,3 +1,4 @@
+import calendar
 import datetime
 import sys
 import os
@@ -28,20 +29,24 @@ def create_month_cotation_store_table():
     conn.close()
 
 def create_cotation_store(store_id, new_total, date):
-    conn = get_connection()
-    cur = conn.cursor()
+    _, last_day = calendar.monthrange(date.year, date.month)
+    check = get_cotation_by_data(store_id=store_id, date_start=datetime.date(date.year,date.month, 1), date_final=datetime.date(date.year,date.month, last_day))
+    print(check)
+    if len(check) == 0 :
+        conn = get_connection()
+        cur = conn.cursor()
+        
+        cur.execute('''
+            INSERT INTO "month_price_stores" (loja_id, cotacao_total, data) 
+            VALUES ( %s, %s, %s);
+        ''', (store_id, new_total, date))
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        return "criado com sucesso"
     
-    cur.execute('''
-        INSERT INTO "month_price_stores" (loja_id, cotacao_total, data) 
-        VALUES ( %s, %s, %s);
-    ''', (store_id, new_total, date))
-    
-    conn.commit()
-    cur.close()
-    conn.close()
-    
-
-    return "criado com sucesso"
+    return None
 
     
 def get_total_prices_store():
@@ -54,21 +59,26 @@ def get_total_prices_store():
     return avg_prices
 
 def get_cotation_by_data(store_id, date_start, date_final):
-    conn = get_connection()
-    cur = conn.cursor()
-    
-    cur.execute('''
-                SELECT cotacao_total, data  
-                FROM "month_price_stores" 
-                WHERE loja_id=%s AND "data" BETWEEN %s AND %s GROUP BY "cotacao_total","data";
-                ''', 
-                (store_id, date_start,date_final))
-    
-    cotations = cur.fetchall()
-    print(cotations)
-    cur.close()
-    conn.close()
-    return {p[1]: p[0] for p in cotations}
+
+    if store_id and date_start and date_final and date_final> date_start:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute('''
+                    SELECT cotacao_total, data  
+                    FROM "month_price_stores" 
+                    WHERE loja_id=%s AND "data" BETWEEN %s AND %s GROUP BY "cotacao_total","data";
+                    ''', 
+                    (store_id, date_start,date_final))
+        
+        cotations = cur.fetchall()
+        print(cotations)
+        cur.close()
+        conn.close()
+        if cotations is not None:
+            return {p[1]: p[0] for p in cotations}
+        else:
+            return None
+    return None
 
 def update_cotation_store(price_id, veiculo_id, loja_id, preco, data):
     conn = get_connection()
@@ -85,8 +95,6 @@ def calculate_month_cotation_store(prices, value_multiplier):
     new_month_price = prices * value_multiplier
     return new_month_price
 
-def update_month_cotation_store(store_id, new_cotacao_total, data):
-    pass
 
 def delete_price(price_id, veiculo_id):
     conn = get_connection()
@@ -104,7 +112,6 @@ def drop_cotation_store():
     cur.close()
     conn.close()
     return "ok"
-
 def get_cotations_count_by_month(store_id: int, date_start: datetime, date_final:datetime):
     conn = get_connection()
     cur = conn.cursor()

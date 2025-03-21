@@ -113,7 +113,7 @@ def delete_price(price_id, veiculo_id):
     
     calculate_and_update_average_price(veiculo_id)
 
-
+#P13-Feature: Função para pegar a quantidade de cotações para uma determinada loja em um periodo de mês/ano
 def get_cotations_count_by_time(store_id, date_start, date_final):
     conn = get_connection()
     cur = conn.cursor()
