@@ -30,7 +30,6 @@ def task_cotacoes_loja(new_date_start: datetime.date,new_date_final:datetime.dat
         count_total_year_month = get_cotations_list(store[0], new_date_start, new_date_final)
         if count_total_year_month is not None:
             new_calculate = get_calculate_month_cotation_store(count_total_year_month['total'],1)
-            print(new_calculate)
             ids = get_create_cotation_store(store_id=store[0], new_total=new_calculate, new_date=new_date_final)
     return "tarefa realizada com sucesso"
 
