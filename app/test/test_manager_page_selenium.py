@@ -26,7 +26,7 @@ class TestUIFeatureCotationStore(unittest.TestCase):
 # Create a WebDriver instance
 
     def test_0_input_store_and_data_to_consult_different_month(self):
-        #campos ainda não existem na pagina.
+        
         driver = self.driver
         driver.get("http://localhost:8501")
         time.sleep(5)
@@ -152,7 +152,7 @@ class TestUIFeatureCotationStore(unittest.TestCase):
         driver.get("http://localhost:8501")
         time.sleep(5)
 
-        tab_gestor_new = driver.find_element(By.ID, 'tabs-bui2-tab-4')
+        tab_gestor_new = driver.find_element(By.ID, 'tabs-bui2-tab-6')
 
         tab_gestor_new.click()
         tab_select = driver.find_element(By.CLASS_NAME, 'st-key-stores_options')

@@ -8,6 +8,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from app.database.config import get_connection
 from app.database.stores import get_stores, create_store, update_store, delete_store
 from app.database.users import get_users, create_user, update_user, delete_user
+
+#Modulo da feature P13. A função contém a UI da nova feature a ser implementada.
 from app.lib.grafico_cotacoes_loja import component_cotacoes_loja
 
 
@@ -125,6 +127,7 @@ def painel_gestor():
             st.header("Gerenciar Veículos")
             st.write("Em construção...")
 
+        #Aba nova da feature P13. Ela chama a função onde pode ser realizado a consulta.
         with aba_grafico_loja:
             component_cotacoes_loja()
 if __name__ == "__main__":

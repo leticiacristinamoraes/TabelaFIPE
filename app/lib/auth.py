@@ -10,7 +10,7 @@ from googleapiclient.discovery import build
 from lib.token_manager import AuthTokenManager
 
 from app.lib.token_manager import AuthTokenManager
-secret_path = os.path.abspath("app/lib/client_secret.json")
+secret_path = os.path.abspath("app/client_secret.json")
 class Authenticator:
     def __init__(
         self,
