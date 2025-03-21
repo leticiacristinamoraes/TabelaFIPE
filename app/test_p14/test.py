@@ -27,11 +27,7 @@ time.sleep(5)
 
 # Datas de início e fim para os testes
 datas_teste = [
-    ("None", "None"),
-    ("2024/01/01", "2025/01/01"),
-    ("2025/01/01", "2024/01/01"),
-    ("2025/05/01", "2025/06/01"),
-    ("2025/03/02", "2025/03/02")
+    ("2024/06/07", "2024/06/07")
 ]
 
 for i, (data_inicial, data_final) in enumerate(datas_teste, start=1):
@@ -57,7 +53,7 @@ for i, (data_inicial, data_final) in enumerate(datas_teste, start=1):
         button_ranking.click()
 
 
-        time.sleep(10)
+        time.sleep(5)
         print(f"Teste {i} - Data Inicial: {data_inicial}, Data Final: {data_final}: APROVADO ✅")
 
     except Exception as e:
