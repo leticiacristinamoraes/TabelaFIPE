@@ -105,7 +105,7 @@ class TestUIFeatureCotationStore(unittest.TestCase):
         time.sleep(30)
 
 
-    def test_6_input_store_and_data_to_consult_with_inexstent_store(self):
+    def test_2_input_store_and_data_to_consult_with_inexstent_store(self):
         #campos ainda não existem na pagina.
         driver = self.driver
         driver.get("http://localhost:8501")
@@ -146,7 +146,7 @@ class TestUIFeatureCotationStore(unittest.TestCase):
         time.sleep(30)
 
 
-    def test_7_input_store_and_data_to_consult_not_in_BD(self):
+    def test_3_input_store_and_data_to_consult_not_in_BD(self):
         #campos ainda não existem na pagina.
         driver = self.driver
         driver.get("http://localhost:8501")

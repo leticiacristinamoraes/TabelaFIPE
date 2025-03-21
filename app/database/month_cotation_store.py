@@ -14,7 +14,7 @@ def create_month_cotation_store_table():
     cur = conn.cursor()
     
     cur.execute("""
-        CREATE TABLE IF NOT EXISTS month_price_stores (
+        CREATE TABLE IF NOT EXISTS month_cotation_stores (
             id SERIAL PRIMARY KEY,
             loja_id INTEGER NOT NULL,
             cotacao_total NUMERIC(10,2) NOT NULL,
@@ -31,13 +31,13 @@ def create_month_cotation_store_table():
 def create_cotation_store(store_id, new_total, date):
     _, last_day = calendar.monthrange(date.year, date.month)
     check = get_cotation_by_data(store_id=store_id, date_start=datetime.date(date.year,date.month, 1), date_final=datetime.date(date.year,date.month, last_day))
-    print(check)
+
     if len(check) == 0 :
         conn = get_connection()
         cur = conn.cursor()
         
         cur.execute('''
-            INSERT INTO "month_price_stores" (loja_id, cotacao_total, data) 
+            INSERT INTO "month_cotation_stores" (loja_id, cotacao_total, data) 
             VALUES ( %s, %s, %s);
         ''', (store_id, new_total, date))
         
@@ -52,7 +52,7 @@ def create_cotation_store(store_id, new_total, date):
 def get_total_prices_store():
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM month_price_stores;")
+    cur.execute("SELECT * FROM month_cotation_stores;")
     avg_prices = cur.fetchall()
     cur.close()
     conn.close()
@@ -65,7 +65,7 @@ def get_cotation_by_data(store_id, date_start, date_final):
         cur = conn.cursor()
         cur.execute('''
                     SELECT cotacao_total, data  
-                    FROM "month_price_stores" 
+                    FROM "month_cotation_stores" 
                     WHERE loja_id=%s AND "data" BETWEEN %s AND %s GROUP BY "cotacao_total","data";
                     ''', 
                     (store_id, date_start,date_final))
@@ -92,8 +92,8 @@ def update_cotation_store(price_id, veiculo_id, loja_id, preco, data):
     conn.close()
 
 def calculate_month_cotation_store(prices, value_multiplier):
-    new_month_price = prices * value_multiplier
-    return new_month_price
+    new_month_cotation = prices * value_multiplier
+    return new_month_cotation
 
 
 def delete_price(price_id, veiculo_id):
@@ -107,7 +107,7 @@ def delete_price(price_id, veiculo_id):
 def drop_cotation_store():
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute('''DROP TABLE IF EXISTS month_price_stores;''')
+    cur.execute('''DROP TABLE IF EXISTS month_cotation_stores;''')
     conn.commit()
     cur.close()
     conn.close()
