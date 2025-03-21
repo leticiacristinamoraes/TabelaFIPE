@@ -4,10 +4,11 @@ import sys
 import os
 import matplotlib.pyplot as plt
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from app.database.config import get_connection
-from app.database.stores import get_stores, create_store, update_store, delete_store
-from app.database.users import get_users, create_user, update_user, delete_user
-from app.database.prices import count_inputs_researcher
+from database.config import get_connection
+from database.stores import get_stores, create_store, update_store, delete_store
+from database.users import get_users, create_user, update_user, delete_user
+from database.prices import count_inputs_researcher
+from database.researcher_commission import insert_commission, commission_consult
 
 
 st.set_page_config(
@@ -126,25 +127,101 @@ def painel_gestor():
 #                   >>>>>>>>>>> Funcionalidade P12/1 <<<<<<<<<<<<
         with aba_metricas_pesquisadores:
             st.header("Métricas dos pesquisadores")
-            pesquisadores2 = listar_pesquisadores()
-            pesquisador_opcoes2 = {p[1]: p[0] for p in pesquisadores2}  # {'nome': id}
-            pesquisador_escolhido2 = st.selectbox("Pesquisador", ["Nome do pesquisador"] + list(pesquisador_opcoes2.keys()), key="nome_pesquisador")
-            pesquisador_id2 = pesquisador_opcoes2.get(pesquisador_escolhido2) if pesquisador_escolhido2 != "Nenhum" else None
-            data_inicial = st.date_input("Data Inicial", format="YYYY-MM-DD",key="data_inicial")
-            data_final = st.date_input("Data final",min_value= data_inicial,format="YYYY-MM-DD",key="data_final")
-            data_inicial = data_inicial.strftime("%Y-%m-%d")
-            data_final = data_final.strftime("%Y-%m-%d")
-            
-            if st.button("Buscar", key="buscar_pesquisador"):
-                tabela = count_inputs_researcher(pesquisador_id2, data_inicial, data_final)
-                df = pd.DataFrame(tabela, columns=['Data', 'Quantidade'])
-                # fig, ax = plt.subplots(figsize=(8,6))
-                # df.plot(x='Data', y='Quantidade', kind='bar',ax=ax)
-                # ax.set_frame_on(False)
-                # #adicionando um título
-                # ax.set_title(f"Quantidade de cotações no mês do(a) pesquisador(a) {pesquisador_escolhido2}",loc='left',pad=30,fontdict={'fontsize':20},color='#3f3f4e')
-                # st.pyplot(fig)
-                st.bar_chart(df.set_index('Data'))
+            aba_cotacoes, aba_comissao = st.tabs(["Cotações", "Comissão"])
+
+            with aba_cotacoes:
+                st.header("Cotações")
+                pesquisadores2 = listar_pesquisadores()
+                pesquisador_opcoes2 = {p[1]: p[0] for p in pesquisadores2}  # {'nome': id}
+                pesquisador_escolhido2 = st.selectbox("Pesquisador", ["Nome do pesquisador"] + list(pesquisador_opcoes2.keys()), key="nome_pesquisador")
+                # Entrada de datas
+                data_inicial = st.date_input("Data Inicial", key="data_inicial")
+                data_final = st.date_input("Data Final", key="data_final")
+
+                if st.button("Buscar", key="key_calcular_comissoes"):
+
+                    # Verificando se o nome digitado é válido apenas quando o botão for pressionado
+                    if pesquisador_escolhido2 not in pesquisador_opcoes2:
+                        st.error("Nome do pesquisador inválido! Por favor, selecione um pesquisador da lista.")
+                        st.stop()
+
+                    pesquisador_id2 = pesquisador_opcoes2[pesquisador_escolhido2]
+
+                    try:
+                        # Convertendo para string no formato correto
+                        data_inicial_str = data_inicial.strftime("%Y-%m-%d")
+                        data_final_str = data_final.strftime("%Y-%m-%d")
+
+                        # Validando se a data final é menor que a data inicial
+                        if data_final < data_inicial:
+                            st.error("A Data Final não pode ser anterior à Data Inicial.")
+                            st.stop()
+                    except Exception as e:
+                        st.error(f"Erro ao processar as datas")
+                        st.stop()
+
+                    # Buscar e exibir os dados
+                    tabela = count_inputs_researcher(pesquisador_id2, data_inicial_str, data_final_str)
+                    df = pd.DataFrame(tabela, columns=['Data', 'Quantidade'])
+
+                    st.bar_chart(df.set_index('Data'))
+
+                # if pesquisador_escolhido2 not in pesquisador_opcoes2:
+                #     st.error("Nome do pesquisador inválido! Por favor, selecione um pesquisador da lista.")
+                #     st.stop()
+                # pesquisador_id2 = pesquisador_opcoes2.get(pesquisador_escolhido2) if pesquisador_escolhido2 != "Nenhum" else None
+                # # Entrada de datas
+                # data_inicial = st.date_input("Data Inicial", key="data_inicial")
+                # data_final = st.date_input("Data Final", key="data_final")
+
+                # try:
+                #     # Convertendo para string no formato correto
+                #     data_inicial_str = data_inicial.strftime("%Y-%m-%d")
+                #     data_final_str = data_final.strftime("%Y-%m-%d")
+
+                #     # Validando se a data final é menor que a data inicial
+                #     if data_final < data_inicial:
+                #         st.error("A Data Final não pode ser anterior à Data Inicial.")
+                #         st.stop()
+                # except Exception as e:
+                #     st.error(f"Erro ao processar as datas: {e}")
+                #     st.stop()
+
+                
+                # if st.button("Buscar", key="key_calcular_comissoes"):
+                #     tabela = count_inputs_researcher(pesquisador_id2, data_inicial, data_final)
+                #     df = pd.DataFrame(tabela, columns=['Data', 'Quantidade'])
+                #     # fig, ax = plt.subplots(figsize=(8,6))
+                #     # df.plot(x='Data', y='Quantidade', kind='bar',ax=ax)
+                #     # ax.set_frame_on(False)
+                #     # #adicionando um título
+                #     # ax.set_title(f"Quantidade de cotações no mês do(a) pesquisador(a) {pesquisador_escolhido2}",loc='left',pad=30,fontdict={'fontsize':20},color='#3f3f4e')
+                #     # st.pyplot(fig)
+                #     st.bar_chart(df.set_index('Data'))
         
+            with aba_comissao:
+                st.header("Comissões")
+                aba_listar_comissao, aba_calcular_comissao = st.tabs(["Listar comissões", "Calcular comissão"])
+
+                with aba_listar_comissao:
+                    st.header("Consulta de comissões")                   
+                    mes = st.selectbox("Mês", [1,2,3,4,5,6,7,8,9,10,11,12], key="mes_comissao_listar")
+                    ano = st.selectbox("Mês", [2024,2025], key="ano_comissao_listar")
+                        
+                    if st.button("Buscar", key="key_listar _comicoes"):
+                        comissoes = commission_consult(mes,ano)
+                        st.write(comissoes)
+
+                with aba_calcular_comissao:
+                    st.header("Calculo de comissões")  
+                    mes = st.selectbox("Mês", [1,2,3,4,5,6,7,8,9,10,11,12], key="mes_comissao_calcular")
+                    ano = st.selectbox("Mês", [2024,2025], key="ano_comissao_calcular")
+                    
+                    if st.button("Calcular", key="key_calcular _comissoes"):
+                        comissoes = insert_commission(mes,ano)
+                        st.success(comissoes)
+
+
+
 if __name__ == "__main__":
     painel_gestor()

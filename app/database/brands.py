@@ -1,7 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from app.database.config import get_connection
+from database.config import get_connection
 
 def create_brands_table():
     conn = get_connection()

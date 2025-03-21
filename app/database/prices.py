@@ -2,12 +2,12 @@ import sys
 import os
 sys.path.append(os.path.abspath("app"))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from app.database.config import get_connection
+from database.config import get_connection
 import os
 import psycopg2
 
 
-from app.database.average_price import calculate_and_update_average_price
+from database.average_price import calculate_and_update_average_price
 
 def create_prices_table():
     conn = get_connection()
