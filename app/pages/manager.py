@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from database.config import get_connection
 from database.stores import get_stores, create_store, update_store, delete_store
 from database.users import get_users, create_user, update_user, delete_user
-from database.prices import count_inputs_researcher
+from database.prices import count_inputs_researcher, count_total
 from database.researcher_commission import insert_commission, commission_consult
 
 
@@ -163,7 +163,8 @@ def painel_gestor():
                     # Buscar e exibir os dados
                     tabela = count_inputs_researcher(pesquisador_id2, data_inicial_str, data_final_str)
                     df = pd.DataFrame(tabela, columns=['Data', 'Quantidade'])
-
+                    total = count_total(pesquisador_id2, data_inicial_str, data_final_str)
+                    st.write((f"Total:{total[0][0]}"))
                     st.bar_chart(df.set_index('Data'))
 
                 # if pesquisador_escolhido2 not in pesquisador_opcoes2:

@@ -131,3 +131,29 @@ GROUP BY data;
     cur.close()
     conn.close()
     return stores_per_researcher
+
+
+def count_total(researcher_id, start_date, end_date):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT 
+	        SUM(cotacoes)
+	        FROM
+                (SELECT data,
+		            COUNT(*) AS cotacoes
+                FROM (SELECT * FROM (SELECT
+	                prices.loja_id,
+	                prices.data,
+	                stores.pesquisador_id
+                FROM prices
+	            INNER JOIN stores ON prices.loja_id = stores.id) T 
+		        WHERE loja_id IN (SELECT id FROM stores WHERE pesquisador_id = {} ) 
+		            AND data BETWEEN '{}' AND '{}') R
+                GROUP BY data) S;
+
+    """.format(researcher_id, start_date, end_date))
+    total_stores_researcher = cur.fetchall()
+    cur.close()
+    conn.close()
+    return total_stores_researcher

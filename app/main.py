@@ -16,6 +16,7 @@ from database.users import get_users
 from database.db_populate import populate_database
 from database.vehicles import get_vehicle_years
 from database.average_price import calculate_and_update_average_price
+from database.researcher_commission import  update_commission
 
 
 from app.lib.auth import Authenticator
@@ -40,6 +41,7 @@ def rodar_agendador():
     
     
     schedule.every().day.at("03:00").do(calculate_and_update_average_price)  # Define a tarefa para 03:00 AM
+    schedule.every().month.at("03:30").do(update_commission)  # Define a tarefa para 03:30 AM no primeiro dia do mês
 
     while True:
         schedule.run_pending()
