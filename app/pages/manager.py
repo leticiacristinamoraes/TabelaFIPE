@@ -24,7 +24,7 @@ st.markdown("""
 st.title("👨‍💼 Pagina do Gestor")
 st.write("Bem vindo à página, acesse a lista de pesquisadores, lojas e gerencie usuários")
 if st.button("Voltar para a Home"):
-   st.switch_page("main.py")
+  st.switch_page("main.py")
 def listar_pesquisadores():
     """Busca pesquisadores cadastrados."""
     return [(user[0], user[1]) for user in get_users() if user[3] == 'pesquisador']
