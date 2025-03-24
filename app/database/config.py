@@ -1,18 +1,12 @@
-import psycopg
+import psycopg2
 import streamlit as st
-from dotenv import load_dotenv
-import sys
-import chardet
 
-load_dotenv()
 def get_connection():
-   
-    conn =psycopg.connect(
-        dbname = 'postgres',
-        user = 'postgres',
-        password = "postgres",
-        host = 'localhost',
-        port = '5432'
-        )  
+    return psycopg2.connect(
+        dbname=st.secrets["database"]["dbname"],
+        user=st.secrets["database"]["user"],
+        password=st.secrets["database"]["password"],
+        host=st.secrets["database"]["host"],
+        port=st.secrets["database"]["port"]
+    )
 
-    return conn
