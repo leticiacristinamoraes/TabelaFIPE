@@ -1,6 +1,6 @@
 import sys
 import os
-
+import psycopg2
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 from database.config import get_connection
