@@ -14,7 +14,7 @@ from app.database.prices import create_price
 from app.database.users import get_researcher_info
 from app.database.ranking_researchers import create_ranking_researchers_table
 from lib.auth import check_authentication, get_user_store_assignment
-
+from database.stores import get_stores, get_stores_by_researcher
 st.set_page_config(
     page_title="Pagina de Pesquisador",
     page_icon="🔍",
@@ -34,11 +34,11 @@ if "connected" not in st.session_state or not st.session_state["connected"]:
     st.stop()  # Para a execução da página
 
 st.title("🔍 Pesquisador")
+
 st.write(f"Bem-vindo de volta, {st.session_state['user_info']['email']}. Insira os preços dos carros da loja pesquisada")
 
 # Pega o ID do usuário logado
 researcher_id = st.session_state["user_id"]
-#st.title(researcher_id)
 
 if st.button("Voltar para a Home"):
    st.switch_page("main.py")
@@ -68,7 +68,6 @@ st.title("Painel do Pesquisador")
 
 # Seleção da loja
 stores = get_stores_by_researcher(researcher_id)
-#stores = get_stores()
 store_names = [store[1] for store in stores]  # Assume que o nome da loja está na segunda posição da tupla
 selected_store = st.selectbox("Selecione a loja", store_names)
 
@@ -91,10 +90,10 @@ if selected_brand:
         
         # Seleção do ano do modelo
         selected_year = st.selectbox("Selecione o ano do modelo", years)
-
+        
         # Campo para inserir o preço
         price = st.number_input("Informe o preço", min_value=0.0, format="%.2f")
-        
+
         # Campo para inserir a data da pesquisa
         research_date = st.date_input("Selecione a data da pesquisa", datetime.today().date())
 

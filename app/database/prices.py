@@ -13,8 +13,6 @@ sys.path.append(os.path.abspath("app"))
 
 from app.database.config import get_connection
 from app.database.average_price import calculate_and_update_average_price
-from database.config import get_connection
-
 
 
 def create_prices_table():
@@ -174,7 +172,6 @@ GROUP BY data;
     cur.close()
     conn.close()
     return stores_per_researcher
-
 
 def count_total(researcher_id, start_date, end_date):
     conn = get_connection()
