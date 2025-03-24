@@ -7,6 +7,7 @@ import time
 import sys
 import pandas as pd
 import psycopg2
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from database.create_tables import create_all_tables
 from database.config import get_connection
 from database.brands import get_brands
@@ -15,8 +16,9 @@ from database.users import get_users
 from database.db_populate import populate_database
 from database.vehicles import get_vehicle_years
 from database.average_price import calculate_and_update_average_price
+from database.researcher_commission import  update_commission
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from app.lib.auth import Authenticator
 
 load_dotenv()
@@ -32,6 +34,15 @@ def database_ja_populado():
 
 if not database_ja_populado():
     populate_database()
+
+
+# Função para rodar o agendador
+def rodar_agendador():
+    """Executa o agendador em loop para verificar tarefas pendentes."""
+    
+    
+    schedule.every().day.at("03:00").do(calculate_and_update_average_price)  # Define a tarefa para 03:00 AM
+    schedule.every().month.at("03:30").do(update_commission)  # Define a tarefa para 03:30 AM no primeiro dia do mês
 
 
 
