@@ -40,6 +40,9 @@ st.write(f"Bem-vindo de volta, {st.session_state['user_info']['email']}. Insira 
 researcher_id = st.session_state["user_id"]
 #st.title(researcher_id)
 
+if st.button("Voltar para a Home"):
+   st.switch_page("main.py")
+
 # Função para obter o ID da loja pelo nome
 def get_store_id_by_name(store_name):
     conn = get_connection()
@@ -62,11 +65,6 @@ def get_brand_id_by_name(brand_name):
 
 # Layout do painel do pesquisador
 st.title("Painel do Pesquisador")
-
-#if st.session_state["connected"]:
-    #email = st.session_state['user_info']['email']  # Obtém o email do usuário logado
-    #researcher_name, researcher_email = get_researcher_info(email)
-
 
 # Seleção da loja
 stores = get_stores_by_researcher(researcher_id)
@@ -96,16 +94,25 @@ if selected_brand:
 
         # Campo para inserir o preço
         price = st.number_input("Informe o preço", min_value=0.0, format="%.2f")
+        
+        # Campo para inserir a data da pesquisa
+        research_date = st.date_input("Selecione a data da pesquisa", datetime.today().date())
+
+        if st.button("Salvar Preço"):
+            store_id = get_store_id_by_name(selected_store)
+            if store_id and model_id and selected_year:
+                data_cotacao = research_date.strftime('%Y-%m-%d')  # Converte para string correta
+                create_price(model_id, store_id, price, data_cotacao)
 
         selected_date = st.date_input("Selecione a data", value=date.today())
 
-        # Botão para salvar o preço
         if st.button("Salvar Preço"):
             store_id = get_store_id_by_name(selected_store)
             if store_id and model_id and selected_year and selected_date:
                 create_price(model_id, store_id, price, selected_date)
-                #create_ranking_researchers_table(researcher_name,researcher_email,price)
+               
                 st.success("Preço cadastrado com sucesso!")
                 
             else:
                 st.error("Erro ao cadastrar o preço. Verifique os dados e tente novamente.")
+

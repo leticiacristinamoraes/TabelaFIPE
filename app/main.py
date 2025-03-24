@@ -118,12 +118,12 @@ if st.session_state["connected"]:
          # if email['role']== 'gestor':
         if st.button("Gestor", use_container_width=True) and st.session_state.user_role == 'gestor':
               st.switch_page("pages/Manager.py")                    
-              st.write("👨‍💼 [Gestor Acelera Sao Paulo](Manager.py)")
+              #st.write("👨‍💼 [Gestor Acelera Sao Paulo](Manager.py)")
             
     with pesquisador:
         #if email['role']== 'pesquisador'  
         if st.button("Pesquisador", use_container_width=True) and st.session_state.user_role == 'pesquisador':
-               st.write("🔍 [Pesquisador](Researcher.py)")
+               #st.write("🔍 [Pesquisador](Researcher.py)")
                st.switch_page("pages/Researcher.py")
           
 if authenticator.valido == False:

@@ -2,6 +2,7 @@ import psycopg2
 from database.config import get_connection
 import sys
 import os
+from datetime import datetime
 import random
 from datetime import datetime, timedelta
 
@@ -27,6 +28,7 @@ def insert_brands():
     conn = get_connection()
     cur = conn.cursor()
     
+    brands = ["Ford", "Chevrolet", "Toyota", "Honda", "Volkswagen", "Hyundai", "Nissan", "Fiat", "Renault", "Jeep"]
     brands = ["Ford", "Chevrolet", "Toyota", "Honda", "Volkswagen",
         "Nissan", "Hyundai", "Renault", "Fiat", "Jeep",
         "Peugeot", "Citroën", "Mitsubishi", "Subaru", "Mazda",
@@ -51,6 +53,16 @@ def insert_models():
     cur = conn.cursor()
     
     models = [
+        (1, "Fiesta"), (1, "Focus"), (1, "Ka"), (1, "EcoSport"), (1, "Ranger"),
+        (2, "Onix"), (2, "Prisma"), (2, "S10"), (2, "Spin"), (2, "Cruze"),
+        (3, "Corolla"), (3, "Hilux"), (3, "Yaris"), (3, "SW4"), (3, "RAV4"),
+        (4, "Civic"), (4, "Fit"), (4, "HR-V"), (4, "City"), (4, "Accord"),
+        (5, "Golf"), (5, "Polo"), (5, "Jetta"), (5, "T-Cross"), (5, "Tiguan"),
+        (6, "HB20"), (6, "Creta"), (6, "Tucson"), (6, "Santa Fe"), (6, "Kona"),
+        (7, "March"), (7, "Versa"), (7, "Sentra"), (7, "Frontier"), (7, "Kicks"),
+        (8, "Uno"), (8, "Mobi"), (8, "Argo"), (8, "Toro"), (8, "Cronos"),
+        (9, "Kwid"), (9, "Sandero"), (9, "Logan"), (9, "Duster"), (9, "Captur"),
+        (10, "Renegade"), (10, "Compass"), (10, "Commander"), (10, "Cherokee"), (10, "Wrangler")
         (1, "Fiesta"), (1, "Focus"), (1, "Ka"),
         (2, "Onix"), (2, "Prisma"), (2, "Tracker"),
         (3, "Corolla"), (3, "Hilux"), (3, "Yaris"),
@@ -96,6 +108,10 @@ def insert_vehicles():
     conn = get_connection()
     cur = conn.cursor()
     
+    vehicles = []
+    for model_id in range(1, 51):  # Adicionando mais modelos
+        for ano_fab in range(2015, 2024):
+            vehicles.append((model_id, ano_fab, ano_fab + 1))
     vehicles = [
         (1, 2018, 2019), (2, 2020, 2021), (3, 2019, 2020),
         (4, 2021, 2022), (5, 2022, 2023), (6, 2017, 2018),
@@ -105,7 +121,6 @@ def insert_vehicles():
         (16, 2019, 2020), (17, 2021, 2022), (18, 2023, 2024),
         (16, 2019, 2020), (17, 2021, 2022), (18, 2023, 2024)
     ]
-    
     query = """
         INSERT INTO vehicles (model_id, ano_fab, ano_modelo) 
         VALUES (%s, %s, %s) 
@@ -133,7 +148,13 @@ def insert_stores():
     cur.execute("SELECT id FROM users WHERE papel = 'pesquisador';")
     pesquisadores = cur.fetchall()
     
+    cur.execute("SELECT id FROM users WHERE papel = 'pesquisador' LIMIT 1;")
+    pesquisador = cur.fetchone()
+    
+    if not pesquisador:
+
     if not pesquisadores:
+
         print("⚠ Nenhum pesquisador encontrado. Criando um padrão...")
         cur.execute(
             "INSERT INTO users (nome, email, papel) VALUES (%s, %s, %s) RETURNING id;",
@@ -145,6 +166,16 @@ def insert_stores():
 
     # Lojas fictícias a serem atribuídas aos pesquisadores
     stores = [
+        ("AutoCar", "Avenida Brasil, 123", "00.000.000/0001-00", pesquisador_id),
+        ("SuperCarros", "Rua das Flores, 456", "11.111.111/0001-11", pesquisador_id),
+        ("Top Veículos", "Alameda Santos, 789", "22.222.222/0001-22", pesquisador_id),
+        ("Prime Motors", "Estrada do Sol, 321", "33.333.333/0001-33", pesquisador_id),
+        ("Elite Cars", "Rodovia Central, 654", "44.444.444/0001-44", pesquisador_id),
+        ("Lux Auto", "Avenida Paulista, 987", "55.555.555/0001-55", pesquisador_id),
+        ("Speed Veículos", "Rua XV de Novembro, 258", "66.666.666/0001-66", pesquisador_id),
+        ("Auto Fácil", "Praça das Nações, 753", "77.777.777/0001-77", pesquisador_id),
+        ("Master Motors", "Boulevard Shopping, 159", "88.888.888/0001-88", pesquisador_id),
+        ("City Cars", "Avenida Independência, 357", "99.999.999/0001-99", pesquisador_id)
         ("AutoCar", "Rua 1", "00.000.000/0001-00"),
         ("SuperCarros", "Rua 2", "11.111.111/0001-11"),
         ("CarCenter", "Rua 3", "22.222.222/0001-22"),
@@ -194,6 +225,11 @@ def insert_users():
     cur = conn.cursor()
     
     users = [
+        ("Cristina", "lleehmoraes@gmail.com", "pesquisador"),
+        ("Letícia", "leticiacristinafmds@gmail.com", "gestor"),
+        ("Juca", "usuariodetestetestando@gmail.com", "pesquisador"),
+        ("França", "leehcristinna@gmail.com", "gestor"),
+        ("Hilario", "hilarioglobo2025@gmail.com", "pesquisador")
         ("Alice", "alice@email.com", "pesquisador"),
         ("Bob", "bob@email.com", "pesquisador"),
         ("Carlos", "carlos@email.com", "gestor"),
@@ -214,8 +250,7 @@ def insert_users():
         ("Riley", "riley@email.com", "pesquisador"),
         ("Sophia", "sophia@email.com", "pesquisador"),
         ("Tom", "tom@email.com", "pesquisador"),
-        ("Uma", "uma@email.com", "pesquisador")
-        
+        ("Uma", "uma@email.com", "pesquisador")   
     ]
     
     query = "INSERT INTO users (nome, email, papel) VALUES (%s, %s, %s) ON CONFLICT (email) DO NOTHING RETURNING id;"
@@ -236,21 +271,27 @@ def insert_prices():
     conn = get_connection()
     cur = conn.cursor()
 
-    # Buscar IDs reais das lojas
     cur.execute("SELECT id FROM stores;")
     store_ids = [row[0] for row in cur.fetchall()]
 
-    # Buscar IDs reais dos veículos
     cur.execute("SELECT id FROM vehicles;")
     vehicle_ids = [row[0] for row in cur.fetchall()]
 
-    # Se não houver lojas ou veículos, não há o que inserir
     if not store_ids or not vehicle_ids:
         print("⚠ Nenhuma loja ou veículo encontrado. Nenhum preço inserido.")
         cur.close()
         conn.close()
         return
 
+    prices = []
+    for i, vehicle_id in enumerate(vehicle_ids):
+        store_id = store_ids[i % len(store_ids)]
+        price = 45000 + (i * 500)  
+        data_cotacao = datetime.now().date()  
+        prices.append((store_id, vehicle_id, price, data_cotacao))
+
+    query = """
+    INSERT INTO prices (loja_id, veiculo_id, preco, data_cotacao) 
     # Criar preços associando IDs reais
     start_date = datetime(2024, 1, 1)
     end_date = datetime(2025, 1, 1)
