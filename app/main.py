@@ -2,11 +2,11 @@ import streamlit as st
 import os
 from dotenv import load_dotenv
 import threading
-import schedule
 import time
 import sys
 import pandas as pd
 import psycopg2
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from database.create_tables import create_all_tables
 from database.config import get_connection
 from database.brands import get_brands
@@ -15,23 +15,23 @@ from database.users import get_users
 from database.db_populate import populate_database
 from database.vehicles import get_vehicle_years
 from database.average_price import calculate_and_update_average_price
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from database.researcher_commission import  update_commission
 from app.lib.auth import Authenticator
 
 load_dotenv()
 create_all_tables()
 
-def database_ja_populado():
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT COUNT(*) FROM brands;")
-    count = cur.fetchone()[0]
-    conn.close()
-    return count > 0 
+# def database_ja_populado():
+#     conn = get_connection()
+#     cur = conn.cursor()
+#     cur.execute("SELECT COUNT(*) FROM brands;")
+#     count = cur.fetchone()[0]
+#     conn.close()
+#     return count > 0 
 
-if not database_ja_populado():
-   populate_database()
+# if not database_ja_populado():
+#     populate_database()
+
 
 # Função para rodar o agendador
 def rodar_agendador():
@@ -39,16 +39,7 @@ def rodar_agendador():
     
     
     schedule.every().day.at("03:00").do(calculate_and_update_average_price)  # Define a tarefa para 03:00 AM
-
-    while True:
-        schedule.run_pending()
-        time.sleep(60)  # Espera 60 segundos antes de verificar novamente
-
-# Garantir que o agendador só seja iniciado uma vez
-if "agendador_iniciado" not in st.session_state:
-    st.session_state["agendador_iniciado"] = True  # Marca como iniciado
-    thread = threading.Thread(target=rodar_agendador, daemon=True)
-    thread.start()
+    schedule.every().month.at("03:30").do(update_commission)  # Define a tarefa para 03:30 AM no primeiro dia do mês
 
 st.set_page_config(
     page_title="Tabela Fipe",
@@ -67,7 +58,9 @@ if "user_role" not in st.session_state:  # Adicionando controle de papéis
 if "logout" not in st.session_state:
     st.session_state["logout"] = False
 if "user_id" not in st.session_state:  # Adicionando controle de papéis
-     st.session_state["user_id"] = None
+
+    st.session_state["user_id"] = None
+    
 if "autenticador" not in st.session_state:
     st.session_state["autenticador"] = None
 
@@ -83,6 +76,7 @@ authenticator = Authenticator(
     secret_path="client_secret.json",
     redirect_uri="http://localhost:8501",
 )
+
 image_url = "https://i.imgur.com/JUvydxA.jpeg"
 
 st.markdown(
@@ -122,6 +116,8 @@ with col5:
     st.image("data:image/png;base64,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", width=100)
 
 
+authenticator.check_auth()
+
 # Creating a layout with columns to position the button in the top right corner
 col1, col2 = st.columns([8, 2]) 
 
@@ -133,7 +129,7 @@ with col1:
 with col2:
     st.markdown("<div style='text-align: right;'>", unsafe_allow_html=True)
     if not st.session_state["connected"]:   
-        authenticator.check_auth()
+        #authenticator.check_auth()
         authenticator.login()
             
     else:
@@ -171,12 +167,12 @@ if st.session_state["connected"]:
          # if email['role']== 'gestor':
         if st.button("Gestor", use_container_width=True) and st.session_state.user_role == 'gestor':
               st.switch_page("pages/Manager.py")                    
-              st.write("👨‍💼 [Gestor Acelera Sao Paulo](Manager.py)")
+              #st.write("👨‍💼 [Gestor Acelera Sao Paulo](Manager.py)")
             
     with pesquisador:
         #if email['role']== 'pesquisador'  
         if st.button("Pesquisador", use_container_width=True) and st.session_state.user_role == 'pesquisador':
-               st.write("🔍 [Pesquisador](Researcher.py)")
+               #st.write("🔍 [Pesquisador](Researcher.py)")
                st.switch_page("pages/Researcher.py")
           
 if authenticator.valido == False:

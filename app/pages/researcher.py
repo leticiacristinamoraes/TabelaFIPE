@@ -5,12 +5,14 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 from datetime import date
-from database.config import get_connection
-from database.stores import get_stores
-from database.brands import get_brands
-from database.models import get_models
-from database.vehicles import get_vehicle_years
-from database.prices import create_price
+from app.database.config import get_connection
+from app.database.stores import get_stores, get_stores_by_researcher
+from app.database.brands import get_brands
+from app.database.models import get_models
+from app.database.vehicles import get_vehicle_years
+from app.database.prices import create_price
+from app.database.users import get_researcher_info
+from app.database.ranking_researchers import create_ranking_researchers_table
 from lib.auth import check_authentication, get_user_store_assignment
 from database.stores import get_stores, get_stores_by_researcher
 st.set_page_config(
@@ -26,11 +28,21 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Verificar se o usuário está autenticado
+if "connected" not in st.session_state or not st.session_state["connected"]:
+    st.error("Você precisa estar logado para acessar esta página.")
+    st.stop()  # Para a execução da página
+
 st.title("🔍 Pesquisador")
-st.write("Bem vindo de volta Pesquisador. Insira os preços dos carros da loja pesquisada")
+
+st.write(f"Bem-vindo de volta, {st.session_state['user_info']['email']}. Insira os preços dos carros da loja pesquisada")
+
+# Pega o ID do usuário logado
+researcher_id = st.session_state["user_id"]
+
 if st.button("Voltar para a Home"):
    st.switch_page("main.py")
-researcher_id = st.session_state["user_id"]
+
 # Função para obter o ID da loja pelo nome
 def get_store_id_by_name(store_name):
     conn = get_connection()
@@ -79,17 +91,27 @@ if selected_brand:
         # Seleção do ano do modelo
         selected_year = st.selectbox("Selecione o ano do modelo", years)
         
-
         # Campo para inserir o preço
         price = st.number_input("Informe o preço", min_value=0.0, format="%.2f")
+
+        # Campo para inserir a data da pesquisa
+        research_date = st.date_input("Selecione a data da pesquisa", datetime.today().date())
+
+        if st.button("Salvar Preço"):
+            store_id = get_store_id_by_name(selected_store)
+            if store_id and model_id and selected_year:
+                data_cotacao = research_date.strftime('%Y-%m-%d')  # Converte para string correta
+                create_price(model_id, store_id, price, data_cotacao)
+
         selected_date = st.date_input("Selecione a data", value=date.today())
-        
-        
-        # Botão para salvar o preço
+
         if st.button("Salvar Preço"):
             store_id = get_store_id_by_name(selected_store)
             if store_id and model_id and selected_year and selected_date:
                 create_price(model_id, store_id, price, selected_date)
+               
                 st.success("Preço cadastrado com sucesso!")
+                
             else:
                 st.error("Erro ao cadastrar o preço. Verifique os dados e tente novamente.")
+
