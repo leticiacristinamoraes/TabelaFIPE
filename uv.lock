@@ -769,6 +769,7 @@ wheels = [
 ]
 
 [[package]]
+<<<<<<< HEAD
 name = "selenium"
 version = "4.29.0"
 source = { registry = "https://pypi.org/simple" }
@@ -786,6 +787,8 @@ wheels = [
 ]
 
 [[package]]
+=======
+>>>>>>> main
 name = "six"
 version = "1.17.0"
 source = { registry = "https://pypi.org/simple" }
@@ -890,7 +893,10 @@ dependencies = [
     { name = "pyjwt" },
     { name = "python-dotenv" },
     { name = "schedule" },
+<<<<<<< HEAD
     { name = "selenium" },
+=======
+>>>>>>> main
     { name = "sqlalchemy", extra = ["asyncio"] },
     { name = "streamlit" },
 ]
@@ -906,7 +912,10 @@ requires-dist = [
     { name = "pyjwt", specifier = "==2.9.0" },
     { name = "python-dotenv", specifier = "==1.0.1" },
     { name = "schedule", specifier = ">=1.2.2" },
+<<<<<<< HEAD
     { name = "selenium", specifier = ">=4.29.0" },
+=======
+>>>>>>> main
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.39" },
     { name = "streamlit", specifier = ">=1.43.1" },
 ]

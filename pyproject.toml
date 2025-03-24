@@ -14,7 +14,6 @@ dependencies = [
     "pyjwt==2.9.0",
     "python-dotenv==1.0.1",
     "schedule>=1.2.2",
-    "selenium>=4.29.0",
     "sqlalchemy[asyncio]>=2.0.39",
     "streamlit>=1.43.1",
 ]

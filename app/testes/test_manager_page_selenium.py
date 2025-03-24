@@ -31,7 +31,7 @@ class TestUIFeatureCotationStore(unittest.TestCase):
         driver.get("http://localhost:8501")
         time.sleep(5)
 
-        tab_gestor_new = driver.find_element(By.ID, 'tabs-bui2-tab-4')
+        tab_gestor_new = driver.find_element(By.ID, 'tabs-bui2-tab-9')
 
         tab_gestor_new.click()
         tab_select = driver.find_element(By.CLASS_NAME, 'st-key-stores_options')
@@ -71,7 +71,7 @@ class TestUIFeatureCotationStore(unittest.TestCase):
         driver.get("http://localhost:8501")
         time.sleep(5)
 
-        tab_gestor_new = driver.find_element(By.ID, 'tabs-bui2-tab-4')
+        tab_gestor_new = driver.find_element(By.ID, 'tabs-bui2-tab-9')
 
         tab_gestor_new.click()
         tab_select = driver.find_element(By.CLASS_NAME, 'st-key-stores_options')
@@ -111,7 +111,7 @@ class TestUIFeatureCotationStore(unittest.TestCase):
         driver.get("http://localhost:8501")
         time.sleep(5)
 
-        tab_gestor_new = driver.find_element(By.ID, 'tabs-bui2-tab-4')
+        tab_gestor_new = driver.find_element(By.ID, 'tabs-bui2-tab-9')
 
         tab_gestor_new.click()
         tab_select = driver.find_element(By.CLASS_NAME, 'st-key-stores_options')
@@ -152,7 +152,7 @@ class TestUIFeatureCotationStore(unittest.TestCase):
         driver.get("http://localhost:8501")
         time.sleep(5)
 
-        tab_gestor_new = driver.find_element(By.ID, 'tabs-bui2-tab-6')
+        tab_gestor_new = driver.find_element(By.ID, 'tabs-bui2-tab-9')
 
         tab_gestor_new.click()
         tab_select = driver.find_element(By.CLASS_NAME, 'st-key-stores_options')
