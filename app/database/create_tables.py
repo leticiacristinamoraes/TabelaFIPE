@@ -1,3 +1,4 @@
+from database.month_cotation_store import create_month_cotation_store_table
 from database.users import create_users_table
 from database.brands import create_brands_table
 from database.models import create_models_table
@@ -23,9 +24,11 @@ def create_all_tables():
     create_vehicles_table()
     create_prices_table()
     create_average_price_table()
+    create_month_cotation_store_table()
     create_producaomens_table()
     criar_funcao_media()
     criar_funcao_topdez()
+
     create_researcher_commission_table()
     create_quotation_researcher_table()
     create_quotation_consults_table()

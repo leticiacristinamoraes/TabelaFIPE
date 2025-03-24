@@ -5,11 +5,12 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "chardet>=5.2.0",
+    "emoji>=2.14.1",
     "extra-streamlit-components==0.1.71",
     "google-api-python-client==2.149.0",
     "google-auth-oauthlib==1.2.1",
-    "psycopg-binary>=3.2.5",
-    "psycopg[binary]>=3.2.5",
+    "psycopg[binary]>=3.2.6",
     "pyjwt==2.9.0",
     "python-dotenv==1.0.1",
     "schedule>=1.2.2",

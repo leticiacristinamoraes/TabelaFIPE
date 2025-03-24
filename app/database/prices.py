@@ -8,8 +8,12 @@ import psycopg2
 from datetime import datetime
 
 
+# Adicione o caminho correto do seu projeto
 sys.path.append(os.path.abspath("app"))
+
+from app.database.config import get_connection
 from app.database.average_price import calculate_and_update_average_price
+
 
 def create_prices_table():
     conn = get_connection()
@@ -99,18 +103,21 @@ def calcular_e_atualizar_media(veiculo_id):
     conn = get_connection()
     cur = conn.cursor()
 
+    # 1. Buscar todos os preços do veículo na tabela 'prices'
     cur.execute("""
-        SELECT preco FROM prices WHERE veiculo_id = %s
+        SELECT price FROM prices WHERE veiculo_id = %s
     """, (veiculo_id,))
     
-    precos = cur.fetchall()  
+    precos = cur.fetchall()  # Retorna uma lista de tuplas [(preco1,), (preco2,), ...]
     
-    if not precos:  
+    if not precos:  # Se não houver preços cadastrados
         print(f"Nenhum preço encontrado para o veículo {veiculo_id}")
         return
     
+    # 2. Calcular a média dos preços
     media_preco = round(sum(p[0] for p in precos) / len(precos), 2)
 
+    # 3. Atualizar ou inserir a média na tabela 'average_price'
     cur.execute("""
         INSERT INTO average_price (veiculo_id, average_price)
         VALUES (%s, %s)
@@ -134,6 +141,16 @@ def delete_price(price_id, veiculo_id):
     
     calculate_and_update_average_price(veiculo_id)
 
+#P13-Feature: Função para pegar a quantidade de cotações para uma determinada loja em um periodo de mês/ano
+def get_cotations_count_by_time(store_id, date_start, date_final):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute('''SELECT COUNT("preco"), EXTRACT(YEAR FROM "data") "year",EXTRACT("month" FROM "data") "month" FROM "prices" WHERE loja_id=%s AND "data" BETWEEN %s AND %s GROUP BY "year", "month" ORDER BY "year","month" ASC;''', (store_id, date_start,date_final))
+    cotations = cur.fetchall()
+    print(cotations)
+    cur.close()
+    conn.close()
+    return {f"{p[1]}/{p[2]}": p[0] for p in cotations}
 def count_inputs_researcher(researcher_id, start_date, end_date):
     conn = get_connection()
     cur = conn.cursor()

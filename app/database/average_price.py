@@ -40,7 +40,32 @@ def get_average_prices():
     cur.close()
     conn.close()
     return avg_prices
+'''
+Versão do Rodrigo do update_average_price
+def update_average_price(veiculo_id):
+    conn = get_connection()
+    cur = conn.cursor()
+    # Testa esse primeiro. 
+    # Ele seleciona os preços do veiculo na tabela prices
+    # retorna o avg_price
+    new_avg_price = cur.execute("""
+       SELECT AVG(price) FROM 'prices' WHERE veiculo_id=:veiculo_id;
+    """, {'veiculo_id': veiculo_id}).fetchone()[0]
+    #aqui ele vai fazer o update. o certo seria checar e criar caso não, mas depois faz.
+    result = cur.execute("""UPDATE 'average_price' SET average_price=%s WHERE veiculo_id=%s;""",{'average_price': new_avg_price, 'veiculo_id': veiculo_id})
+    
+    
+    # Se não der, vai nesse, faz mesma coisa só outra forma.
 
+     new_avg_price = cur.execute("""
+       SELECT AVG(price) FROM "prices" WHERE veiculo_id=:veiculo_id;
+    """,(veiculo_id).fetchone()[0]
+     result = cur.execute("""UPDATE 'average_price' SET average_price=%s WHERE veiculo_id=%s;""",(new_avg_price, veiculo_id))
+
+    conn.commit()
+    cur.close()
+    conn.close()'
+'''
 def update_average_price(avg_price_id, vehicle_id, avg_price):
     conn = get_connection()
     cur = conn.cursor()

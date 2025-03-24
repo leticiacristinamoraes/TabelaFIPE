@@ -9,3 +9,4 @@ def get_connection():
         host=st.secrets["database"]["host"],
         port=st.secrets["database"]["port"]
     )
+

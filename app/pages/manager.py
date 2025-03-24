@@ -1,7 +1,9 @@
 import streamlit as st
 import pandas as pd
 import sys
+
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import matplotlib.pyplot as plt
 import plotly.express as px
 from datetime import datetime
@@ -17,6 +19,8 @@ from app.database.ranking_researchers import generate_research_graph, get_rankin
 from app.database.researcher_commission import insert_commission, commission_consult
 from app.database.research_stats import get_research_data
 from app.database.dezess import mostrar_top_10_grafico
+#Modulo da feature P13. A função contém a UI da nova feature a ser implementada.
+from app.lib.grafico_cotacoes_loja import component_cotacoes_loja
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from app.database.quotation_researcher import get_researcher_quotations
@@ -46,7 +50,8 @@ def listar_pesquisadores():
 
 def painel_gestor():
     st.title("Painel do Gestor")
-    aba_cadastro, aba_listagem, aba_pesquisadores, aba_metricas_pesquisadores, aba_relatorio, aba_ranking, ranking_geral, aba_Topdezmensal = st.tabs(["Cadastrar Loja", "Listar Lojas", "Gerenciar Usuários", "Gerenciar Pesquisadores", "Metricas dos Pesquisadores", "Relatório de Cotações","Ranking Top 10", "Ranking Geral", "Produtividade Mensal"])
+
+    aba_cadastro, aba_listagem, aba_pesquisadores, aba_metricas_pesquisadores, aba_gerenciar_pesquisadores, aba_relatorio, aba_ranking, ranking_geral, aba_grafico_loja, aba_Topdezmensal = st.tabs(["Cadastrar Loja", "Listar Lojas", "Gerenciar Usuários", "Gerenciar Pesquisadores", "Metricas dos Pesquisadores", "Relatório de Cotações","Ranking Top 10", "Ranking Geral"])
 
     with aba_cadastro:
         st.header("Cadastrar Nova Loja")
@@ -389,6 +394,11 @@ def painel_gestor():
             st.warning("Nenhum resultado encontrado.")
         else:
             st.dataframe(df)  # Exibe a tabela completa
+
+
+        #Aba nova da feature P13. Ela chama a função onde pode ser realizado a consulta.
+        with aba_grafico_loja:
+            component_cotacoes_loja()
 
             
       with aba_Topdezmensal:           
