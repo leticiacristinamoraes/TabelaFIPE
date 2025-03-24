@@ -16,6 +16,7 @@ from app.database.stores import get_stores, create_store, update_store, delete_s
 from app.database.users import get_users, create_user, update_user, delete_user
 from app.database.ranking_researchers import generate_research_graph, get_ranking_researchers_table
 from app.database.researcher_commission import insert_commission, commission_consult
+from app.database.research_stats import get_research_data
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -47,7 +48,7 @@ def listar_pesquisadores():
 def painel_gestor():
     st.title("Painel do Gestor")
 
-    aba_cadastro, aba_listagem, aba_pesquisadores, aba_metricas_pesquisadores, aba_relatorio, aba_ranking, ranking_geral = st.tabs(["Cadastrar Loja", "Listar Lojas", "Gerenciar Usuários", "Metricas dos Pesquisadores", "Relatório de Cotações","Ranking Top 10", "Ranking Geral"])
+    aba_cadastro, aba_listagem, aba_pesquisadores, aba_metricas_pesquisadores, aba_relatorio, aba_ranking, ranking_geral = st.tabs(["Cadastrar Loja", "Listar Lojas", "Gerenciar Usuários", "Gerenciar Pesquisadores", "Metricas dos Pesquisadores", "Relatório de Cotações","Ranking Top 10", "Ranking Geral"])
 
 
     with aba_cadastro:
@@ -136,6 +137,51 @@ def painel_gestor():
                                 st.warning("Usuário removido com sucesso!")
             else:
                 st.warning("Nenhum usuário cadastrado.")
+
+        #Funcionalidade P15
+        
+        with aba_gerenciar_pesquisadores:
+            st.header("🔬 Gerenciar Pesquisadores")
+            st.subheader("Consulta de Produção do Pesquisador")
+        
+            pesquisadores = listar_pesquisadores()
+            pesquisadores_dict = {p[0]: p[1] for p in pesquisadores}
+            pesquisador_id = st.selectbox("Selecione o Pesquisador", options=list(pesquisadores_dict.keys()), format_func=lambda x: pesquisadores_dict[x])
+        
+            col1, col2 = st.columns(2)
+            with col1:
+                ano_inicio = st.selectbox("Ano Inicial", options=list(range(2020, 2026)), index=3)
+                mes_inicio = st.selectbox("Mês Inicial", options=list(range(1, 13)), index=0)
+        
+            with col2:
+                ano_fim = st.selectbox("Ano Final", options=list(range(2020, 2026)), index=3)
+                mes_fim = st.selectbox("Mês Final", options=list(range(1, 13)), index=11)
+        
+            df = pd.DataFrame(columns=["search_date", "search_count"])
+        
+            if st.button("📈 Gerar Relatório"):
+                dados = get_research_data(pesquisador_id, ano_inicio, mes_inicio, ano_fim, mes_fim)
+        
+                if dados is not None and not dados.empty:
+                    df = pd.DataFrame(dados, columns=["search_date", "search_count"])
+                else:
+                    df = pd.DataFrame(columns=["search_date", "search_count"])
+        
+            if df.empty:
+                st.warning("⚠️ Nenhuma pesquisa encontrada para este período.")
+            else:
+                st.success("🔎 Resultados da Produção")
+        
+                col1, col2 = st.columns([1, 2])
+        
+                with col1:
+                    st.write("📋 **Tabela de Produção**")
+                    st.dataframe(df, height=300)
+        
+                with col2:
+                    st.write("📈 **Gráfico de Produção**")
+                    st.bar_chart(df.set_index("search_date"))
+
         
 #                   >>>>>>>>>>> Funcionalidade P12/1 <<<<<<<<<<<<
         with aba_metricas_pesquisadores:
