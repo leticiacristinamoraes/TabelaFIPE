@@ -1,6 +1,8 @@
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
 from database.config import get_connection
 
 def create_users_table():
@@ -52,25 +54,64 @@ def update_user(user_id, nome, email, papel):
     conn.close()
 
 def delete_user(user_id):
+    """Exclui um usuário, atribuindo as lojas a outro pesquisador, se necessário."""
     conn = get_connection()
     cur = conn.cursor()
 
-    # Verifica se o usuário é um pesquisador e está vinculado a alguma loja
-    cur.execute("SELECT COUNT(*) FROM stores WHERE pesquisador_id = %s;", (user_id,))
-    resultado = cur.fetchone()[0]
+    try:
+        # Verifica se o usuário a ser excluído é um pesquisador
+        cur.execute("SELECT papel FROM users WHERE id = %s;", (user_id,))
+        user_role = cur.fetchone()
 
-    if resultado > 0:
-        # Caso tenha lojas associadas, podemos:
-        # 1. Transferir para outro pesquisador
-        cur.execute("UPDATE stores SET pesquisador_id = (SELECT id FROM users WHERE papel = 'pesquisador' LIMIT 1) WHERE pesquisador_id = %s;", (user_id,))
+        if user_role and user_role[0] == 'pesquisador':
+            # Busca um novo pesquisador para atribuir às lojas
+            cur.execute("SELECT id FROM users WHERE papel = 'pesquisador' AND id <> %s LIMIT 1;", (user_id,))
+            new_pesquisador = cur.fetchone()
 
-        # OU
+            if new_pesquisador:
+                new_pesquisador_id = new_pesquisador[0]
+                # Atualiza as lojas para o novo pesquisador
+                cur.execute("UPDATE stores SET pesquisador_id = %s WHERE pesquisador_id = %s;", (new_pesquisador_id, user_id))
+                print(f"🔄 Lojas transferidas para o pesquisador {new_pesquisador_id}.")
+            else:
+                print("⚠ Nenhum outro pesquisador disponível. Não é possível excluir este usuário.")
+                return  # Sai da função sem excluir o usuário
 
-        # 2. Excluir as lojas associadas
-        #cur.execute("DELETE FROM stores WHERE pesquisador_id = %s;", (user_id,))
+        # Exclui o usuário
+        cur.execute("DELETE FROM users WHERE id = %s;", (user_id,))
+        conn.commit()
+        print(f"✅ Usuário {user_id} excluído com sucesso.")
+    except psycopg2.Error as e:
+        conn.rollback()
+        print(f"❌ Erro ao excluir usuário: {e}")
 
+    finally:
+        cur.close()
+        conn.close()
     # Agora pode excluir o usuário sem erro
     cur.execute("DELETE FROM users WHERE id = %s;", (user_id,))
     conn.commit()
     cur.close()
     conn.close()
+
+def get_researcher_info(email):
+    """Retorna o nome e email do pesquisador logado."""
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT nome, email
+        FROM users
+        WHERE email = %s
+        """,
+        (email,),
+    )
+    result = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    if result:
+        return result
+    else:
+        return None, None
+    

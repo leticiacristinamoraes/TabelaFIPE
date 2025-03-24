@@ -2,7 +2,7 @@ import streamlit as st
 import os
 from dotenv import load_dotenv
 import threading
-import schedule
+#import schedule
 import time
 import sys
 import pandas as pd
@@ -33,7 +33,8 @@ def database_ja_populado():
     return count > 0 
 
 if not database_ja_populado():
-   populate_database()
+    populate_database()
+
 
 # Função para rodar o agendador
 def rodar_agendador():
@@ -43,15 +44,7 @@ def rodar_agendador():
     schedule.every().day.at("03:00").do(calculate_and_update_average_price)  # Define a tarefa para 03:00 AM
     schedule.every().month.at("03:30").do(update_commission)  # Define a tarefa para 03:30 AM no primeiro dia do mês
 
-    while True:
-        schedule.run_pending()
-        time.sleep(60)  # Espera 60 segundos antes de verificar novamente
 
-# Garantir que o agendador só seja iniciado uma vez
-if "agendador_iniciado" not in st.session_state:
-    st.session_state["agendador_iniciado"] = True  # Marca como iniciado
-    thread = threading.Thread(target=rodar_agendador, daemon=True)
-    thread.start()
 
 st.set_page_config(
     page_title="Tabela Fipe",
@@ -69,6 +62,8 @@ if "user_role" not in st.session_state:  # Adicionando controle de papéis
     st.session_state["user_role"] = None
 if "logout" not in st.session_state:
     st.session_state["logout"] = False
+if "user_id" not in st.session_state:  # Adicionando controle de papéis
+    st.session_state["user_id"] = None
 if "autenticador" not in st.session_state:
     st.session_state["autenticador"] = None
 
@@ -84,7 +79,7 @@ authenticator = Authenticator(
     secret_path="client_secret.json",
     redirect_uri="http://localhost:8501",
 )
-
+authenticator.check_auth()
 # Creating a layout with columns to position the button in the top right corner
 col1, col2 = st.columns([8, 2]) 
 
@@ -96,7 +91,7 @@ with col1:
 with col2:
     st.markdown("<div style='text-align: right;'>", unsafe_allow_html=True)
     if not st.session_state["connected"]:   
-        authenticator.check_auth()
+        #authenticator.check_auth()
         authenticator.login()
             
     else:
@@ -126,6 +121,7 @@ if st.session_state["connected"]:
     for user in users:
             if user[2] == email:  # user[2] é o campo "email" na tupla
                 st.session_state.user_role = user[3]
+                st.session_state.user_id = user[0]
     
    #
     gestor, pesquisador = st.columns(2)
@@ -133,12 +129,12 @@ if st.session_state["connected"]:
          # if email['role']== 'gestor':
         if st.button("Gestor", use_container_width=True) and st.session_state.user_role == 'gestor':
               st.switch_page("pages/Manager.py")                    
-              st.write("👨‍💼 [Gestor Acelera Sao Paulo](Manager.py)")
+              #st.write("👨‍💼 [Gestor Acelera Sao Paulo](Manager.py)")
             
     with pesquisador:
         #if email['role']== 'pesquisador'  
         if st.button("Pesquisador", use_container_width=True) and st.session_state.user_role == 'pesquisador':
-               st.write("🔍 [Pesquisador](Researcher.py)")
+               #st.write("🔍 [Pesquisador](Researcher.py)")
                st.switch_page("pages/Researcher.py")
           
 if authenticator.valido == False:
