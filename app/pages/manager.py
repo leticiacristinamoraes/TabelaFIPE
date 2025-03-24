@@ -2,14 +2,13 @@ import streamlit as st
 import pandas as pd
 import sys
 import os
-
 import matplotlib.pyplot as plt
+import plotly.express as px
 from datetime import datetime
 from app.database.config import get_connection
 from app.database.stores import get_stores, create_store, update_store, delete_store
 from app.database.users import get_users, create_user, update_user, delete_user
 from datetime import date
-import plotly.express as px
 from app.database.config import get_connection
 from app.database.prices import count_inputs_researcher, count_total
 from app.database.stores import get_stores, create_store, update_store, delete_store
@@ -17,7 +16,7 @@ from app.database.users import get_users, create_user, update_user, delete_user
 from app.database.ranking_researchers import generate_research_graph, get_ranking_researchers_table
 from app.database.researcher_commission import insert_commission, commission_consult
 from app.database.research_stats import get_research_data
-
+from app.database.dezess import mostrar_top_10_grafico
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from app.database.quotation_researcher import get_researcher_quotations
@@ -47,9 +46,7 @@ def listar_pesquisadores():
 
 def painel_gestor():
     st.title("Painel do Gestor")
-
-    aba_cadastro, aba_listagem, aba_pesquisadores, aba_metricas_pesquisadores, aba_relatorio, aba_ranking, ranking_geral = st.tabs(["Cadastrar Loja", "Listar Lojas", "Gerenciar Usuários", "Gerenciar Pesquisadores", "Metricas dos Pesquisadores", "Relatório de Cotações","Ranking Top 10", "Ranking Geral"])
-
+    aba_cadastro, aba_listagem, aba_pesquisadores, aba_metricas_pesquisadores, aba_relatorio, aba_ranking, ranking_geral, aba_Topdezmensal = st.tabs(["Cadastrar Loja", "Listar Lojas", "Gerenciar Usuários", "Gerenciar Pesquisadores", "Metricas dos Pesquisadores", "Relatório de Cotações","Ranking Top 10", "Ranking Geral", "Produtividade Mensal"])
 
     with aba_cadastro:
         st.header("Cadastrar Nova Loja")
@@ -138,8 +135,6 @@ def painel_gestor():
             else:
                 st.warning("Nenhum usuário cadastrado.")
 
-        #Funcionalidade P15
-        
         with aba_gerenciar_pesquisadores:
             st.header("🔬 Gerenciar Pesquisadores")
             st.subheader("Consulta de Produção do Pesquisador")
@@ -181,9 +176,7 @@ def painel_gestor():
                 with col2:
                     st.write("📈 **Gráfico de Produção**")
                     st.bar_chart(df.set_index("search_date"))
-
-        
-#                   >>>>>>>>>>> Funcionalidade P12/1 <<<<<<<<<<<<
+                 
         with aba_metricas_pesquisadores:
             st.header("Métricas dos pesquisadores")
             aba_cotacoes, aba_comissao = st.tabs(["Cotações", "Comissão"])
@@ -259,29 +252,6 @@ def painel_gestor():
                 #     # st.pyplot(fig)
                 #     st.bar_chart(df.set_index('Data'))
         
-            with aba_comissao:
-                st.header("Comissões")
-                aba_listar_comissao, aba_calcular_comissao = st.tabs(["Listar comissões", "Calcular comissão"])
-
-                with aba_listar_comissao:
-                    st.header("Consulta de comissões")                   
-                    mes = st.selectbox("Mês", [1,2,3,4,5,6,7,8,9,10,11,12], key="mes_comissao_listar")
-                    ano = st.selectbox("Mês", [2024,2025], key="ano_comissao_listar")
-                        
-                    if st.button("Buscar", key="key_listar _comicoes"):
-                        comissoes = commission_consult(mes,ano)
-                        st.write(comissoes)
-
-                with aba_calcular_comissao:
-                    st.header("Calculo de comissões")  
-                    mes = st.selectbox("Mês", [1,2,3,4,5,6,7,8,9,10,11,12], key="mes_comissao_calcular")
-                    ano = st.selectbox("Mês", [2024,2025], key="ano_comissao_calcular")
-                    
-                    if st.button("Calcular", key="key_calcular _comissoes"):
-                        comissoes = insert_commission(mes,ano)
-                        st.success(comissoes)
-
-
         with aba_relatorio:
             st.header("Relatório de Cotações por Pesquisador")
             sub_aba_consulta, sub_aba_minhas_consultas = st.tabs(["Cotações por Pesquisador", "Minhas Consultas"])
@@ -420,5 +390,31 @@ def painel_gestor():
         else:
             st.dataframe(df)  # Exibe a tabela completa
 
+            
+      with aba_Topdezmensal:           
+        
+        mostrar_top_10_grafico()
+            with aba_comissao:
+                st.header("Comissões")
+                aba_listar_comissao, aba_calcular_comissao = st.tabs(["Listar comissões", "Calcular comissão"])
+
+                with aba_listar_comissao:
+                    st.header("Consulta de comissões")                   
+                    mes = st.selectbox("Mês", [1,2,3,4,5,6,7,8,9,10,11,12], key="mes_comissao_listar")
+                    ano = st.selectbox("Mês", [2024,2025], key="ano_comissao_listar")
+                        
+                    if st.button("Buscar", key="key_listar _comicoes"):
+                        comissoes = commission_consult(mes,ano)
+                        st.write(comissoes)
+
+                with aba_calcular_comissao:
+                    st.header("Calculo de comissões")  
+                    mes = st.selectbox("Mês", [1,2,3,4,5,6,7,8,9,10,11,12], key="mes_comissao_calcular")
+                    ano = st.selectbox("Mês", [2024,2025], key="ano_comissao_calcular")
+                    
+                    if st.button("Calcular", key="key_calcular _comissoes"):
+                        comissoes = insert_commission(mes,ano)
+                        st.success(comissoes)       
+            
 if __name__ == "__main__":
     painel_gestor()
