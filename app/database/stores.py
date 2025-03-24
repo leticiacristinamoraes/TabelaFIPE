@@ -1,4 +1,8 @@
-from app.database.config import get_connection
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
+from database.config import get_connection
 
 def create_stores_table():
     conn = get_connection()
@@ -35,6 +39,19 @@ def get_stores():
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("SELECT id, nome, endereco, cnpj, COALESCE(pesquisador_id, 0) FROM stores;")
+    stores = cur.fetchall()
+    cur.close()
+    conn.close()
+    return stores if stores else []
+
+def get_stores_by_researcher(pesquisador_id):
+    """Retorna apenas as lojas associadas a um determinado pesquisador."""
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT id, nome, endereco, cnpj FROM stores WHERE pesquisador_id = %s;", 
+        (pesquisador_id,)
+    )
     stores = cur.fetchall()
     cur.close()
     conn.close()

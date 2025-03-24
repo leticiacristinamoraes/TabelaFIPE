@@ -6,6 +6,12 @@ from datetime import datetime
 from app.database.config import get_connection
 from app.database.stores import get_stores, create_store, update_store, delete_store
 from app.database.users import get_users, create_user, update_user, delete_user
+from datetime import date
+import plotly.express as px
+from app.database.config import get_connection
+from app.database.stores import get_stores, create_store, update_store, delete_store
+from app.database.users import get_users, create_user, update_user, delete_user
+from app.database.ranking_researchers import generate_research_graph, get_ranking_researchers_table
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from app.database.quotation_researcher import get_researcher_quotations
@@ -35,7 +41,9 @@ def listar_pesquisadores():
 
 def painel_gestor():
     st.title("Painel do Gestor")
+
     aba_cadastro, aba_listagem, aba_pesquisadores, aba_relatorio = st.tabs(["Cadastrar Loja", "Listar Lojas", "Gerenciar Usuários", "Relatório de Cotações"])
+    aba_cadastro, aba_listagem, aba_pesquisadores, aba_veiculos, aba_ranking, ranking_geral = st.tabs(["Cadastrar Loja", "Listar Lojas", "Gerenciar Usuários", "Gerenciar Veículos", "Ranking Top 10", "Ranking Geral"])
 
     with aba_cadastro:
         st.header("Cadastrar Nova Loja")
@@ -204,9 +212,63 @@ def painel_gestor():
                                 df = pd.DataFrame(quotations, columns=["Pesquisador", "Mês", "Total de Cotações"])
                                 df["Mês"] = df["Mês"].str.strip()  
 
+
                                 st.dataframe(df)
                             else:
                                 st.warning("Nenhuma cotação encontrada para o período selecionado.")
-                                
+
+    with aba_ranking:
+        st.header("Top 10 Pesquisadores")
+
+        # Input de Data Inicial e Final
+        col1, col2 = st.columns(2)
+        with col1:
+            start_date = st.date_input("Selecione a Data Inicial", value=None)
+        with col2:
+            end_date = st.date_input("Selecione a Data Final", value=None, min_value=start_date if start_date else None)
+
+        # Botão para gerar gráfico
+        if st.button("Gerar Gráfico"):
+            if not start_date or not end_date:
+                st.warning("Por favor, selecione um intervalo de datas válido.")
+            elif end_date < start_date:
+                st.error("A Data Final não pode ser anterior à Data Inicial.")
+            elif start_date and end_date:
+                df = generate_research_graph(start_date, end_date)
+
+                if df.empty:
+                    st.warning("⚠️ Nenhum dado encontrado para o período selecionado.")
+                else:
+                    # Criar gráfico de barras verticais com Plotly
+                    fig = px.bar(
+                        df,
+                        x="user_name", 
+                        y="total_pesquisas", 
+                        title="Top 10 Pesquisadores por Número de Pesquisas",
+                        labels={"user_name": "Pesquisador", "total_pesquisas": "Total de Pesquisas"},
+                        color="total_pesquisas",
+                        color_continuous_scale="blues"
+                    )
+
+                    fig.update_layout(
+                        xaxis_tickangle=-45,  # Inclina os rótulos do eixo X para melhor legibilidade
+                        xaxis_title="Pesquisador",
+                        yaxis_title="Total de Pesquisas"
+                    )
+
+                    # Exibir gráfico no Streamlit
+                    st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.warning("⚠️ Por favor, selecione um intervalo de datas válido.")
+    
+    with ranking_geral:
+        st.header("Ranking geral dos Pesquisadores")
+        df = get_ranking_researchers_table()
+    
+        if df.empty:
+            st.warning("Nenhum resultado encontrado.")
+        else:
+            st.dataframe(df)  # Exibe a tabela completa
+
 if __name__ == "__main__":
     painel_gestor()
