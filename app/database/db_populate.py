@@ -151,7 +151,6 @@ def insert_stores():
     cur.execute("SELECT id FROM users WHERE papel = 'pesquisador' LIMIT 1;")
     pesquisador = cur.fetchone()
     
-    if not pesquisador:
 
     if not pesquisadores:
 
@@ -291,7 +290,7 @@ def insert_prices():
         prices.append((store_id, vehicle_id, price, data_cotacao))
 
     query = """
-    INSERT INTO prices (loja_id, veiculo_id, preco, data_cotacao) 
+    INSERT INTO prices (loja_id, veiculo_id, preco, data_cotacao)"""
     # Criar preços associando IDs reais
     start_date = datetime(2024, 1, 1)
     end_date = datetime(2025, 1, 1)
