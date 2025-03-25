@@ -21,7 +21,6 @@ def create_research_stats_table():
     cur.close()
     conn.close()
 
-
 def get_research_data(pesquisador_id, ano_inicio, mes_inicio, ano_fim, mes_fim):
 
     create_research_stats_table()

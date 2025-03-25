@@ -102,13 +102,6 @@ if selected_brand:
             if store_id and model_id and selected_year:
                 data_cotacao = research_date.strftime('%Y-%m-%d')  # Converte para string correta
                 create_price(model_id, store_id, price, data_cotacao)
-
-        selected_date = st.date_input("Selecione a data", value=date.today())
-
-        if st.button("Salvar Preço"):
-            store_id = get_store_id_by_name(selected_store)
-            if store_id and model_id and selected_year and selected_date:
-                create_price(model_id, store_id, price, selected_date)
                
                 st.success("Preço cadastrado com sucesso!")
                 
