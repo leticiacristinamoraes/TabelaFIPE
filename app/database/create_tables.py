@@ -1,3 +1,4 @@
+from app.database.research_stats import create_research_stats_table
 from database.month_cotation_store import create_month_cotation_store_table
 from database.users import create_users_table
 from database.brands import create_brands_table
@@ -33,6 +34,7 @@ def create_all_tables():
     create_quotation_researcher_table()
     create_quotation_consults_table()
     create_ranking_researchers_table()
+    create_research_stats_table()
 
     print("Todas as tabelas foram criadas com sucesso!")
 
