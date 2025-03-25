@@ -25,7 +25,7 @@ def create_prices_table():
             veiculo_id INTEGER NOT NULL,
             loja_id INTEGER NOT NULL,
             preco NUMERIC(10,2) NOT NULL,
-            data_cotacao DATE NOT NULL,  
+            data DATE NOT NULL,  
             FOREIGN KEY (veiculo_id) REFERENCES vehicles(id) ON DELETE CASCADE,
             FOREIGN KEY (loja_id) REFERENCES stores(id) ON DELETE CASCADE
         );
@@ -56,7 +56,7 @@ def create_price(veiculo_id, loja_id, preco, data_cotacao):
         print(f"DATA QUE SERÁ INSERIDA NO BANCO: {data_cotacao} (Tipo: {type(data_cotacao)})")
 
         cur.execute("""
-            INSERT INTO prices (veiculo_id, loja_id, preco, data_cotacao) 
+            INSERT INTO prices (veiculo_id, loja_id, preco, data) 
             VALUES (%s, %s, %s, %s) RETURNING id;
         """, (veiculo_id, loja_id, preco, data_cotacao))
         
@@ -88,7 +88,7 @@ def update_price(price_id, veiculo_id, loja_id, preco, data_cotacao):
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("""
-        UPDATE prices SET veiculo_id = %s, loja_id = %s, preco = %s, data_cotacao = %s 
+        UPDATE prices SET veiculo_id = %s, loja_id = %s, preco = %s, data = %s 
         WHERE id = %s;
     """, (veiculo_id, loja_id, preco, data_cotacao, price_id))
     conn.commit()

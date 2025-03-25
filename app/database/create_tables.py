@@ -11,6 +11,7 @@ from database.researcher_commission import create_researcher_commission_table
 from database.quotation_researcher import create_quotation_researcher_table
 from database.quotation_consults import create_quotation_consults_table
 from database.ranking_researchers import create_ranking_researchers_table
+from database.research_stats import create_research_stats_table
 
 import sys
 import os
@@ -32,6 +33,7 @@ def create_all_tables():
     create_researcher_commission_table()
     create_quotation_researcher_table()
     create_ranking_researchers_table()
+    create_research_stats_table()
 
     print("Todas as tabelas foram criadas com sucesso!")
 
