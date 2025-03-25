@@ -172,7 +172,7 @@ def mostrar_top_10_grafico():
         return
 
     
-    if st.button("Gerar Gráfico"):
+    if st.button("Gerar Gráfico", key="gerar_grafico_top10"):
         df = get_top_10_pesquisadores(mes_inic, ano_inic, mes_fim, ano_fim)
 
         if df.empty:
