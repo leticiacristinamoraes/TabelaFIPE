@@ -51,7 +51,7 @@ def listar_pesquisadores():
 def painel_gestor():
     st.title("Painel do Gestor")
 
-    aba_cadastro, aba_listagem, aba_pesquisadores, aba_metricas_pesquisadores, aba_gerenciar_pesquisadores, aba_relatorio, aba_ranking, ranking_geral, aba_grafico_loja, aba_Topdezmensal = st.tabs(["Cadastrar Loja", "Listar Lojas", "Gerenciar Usuários", "Gerenciar Pesquisadores", "Metricas dos Pesquisadores", "Relatório de Cotações","Ranking Top 10", "Ranking Geral"])
+    aba_cadastro, aba_listagem, aba_pesquisadores, aba_gerenciar_pesquisadores, aba_metricas_pesquisadores,  aba_relatorio, aba_ranking, ranking_geral, aba_grafico_loja, aba_Topdezmensal, aba_comissao = st.tabs(["Cadastrar Loja", "Listar Lojas", "Gerenciar Usuários", "Gerenciar Pesquisadores", "Metricas dos Pesquisadores", "Relatório de Cotações","Ranking Top 10", "Ranking Geral", "Cotações da loja", "Top 10 mensal", "Comissões"])
 
     with aba_cadastro:
         st.header("Cadastrar Nova Loja")
@@ -140,22 +140,22 @@ def painel_gestor():
             else:
                 st.warning("Nenhum usuário cadastrado.")
 
-        with aba_gerenciar_pesquisadores:
-            st.header("🔬 Gerenciar Pesquisadores")
-            st.subheader("Consulta de Produção do Pesquisador")
+    with aba_gerenciar_pesquisadores:
+        st.header("🔬 Gerenciar Pesquisadores")
+        st.subheader("Consulta de Produção do Pesquisador")
         
-            pesquisadores = listar_pesquisadores()
-            pesquisadores_dict = {p[0]: p[1] for p in pesquisadores}
-            pesquisador_id = st.selectbox("Selecione o Pesquisador", options=list(pesquisadores_dict.keys()), format_func=lambda x: pesquisadores_dict[x])
+        pesquisadores = listar_pesquisadores()
+        pesquisadores_dict = {p[0]: p[1] for p in pesquisadores}
+        pesquisador_id = st.selectbox("Selecione o Pesquisador", options=list(pesquisadores_dict.keys()), format_func=lambda x: pesquisadores_dict[x])
         
-            col1, col2 = st.columns(2)
-            with col1:
-                ano_inicio = st.selectbox("Ano Inicial", options=list(range(2020, 2026)), index=3)
-                mes_inicio = st.selectbox("Mês Inicial", options=list(range(1, 13)), index=0)
+        col1, col2 = st.columns(2)
+        with col1:
+            ano_inicio = st.selectbox("Ano Inicial", options=list(range(2020, 2026)), index=3)
+            mes_inicio = st.selectbox("Mês Inicial", options=list(range(1, 13)), index=0)
         
-            with col2:
-                ano_fim = st.selectbox("Ano Final", options=list(range(2020, 2026)), index=3)
-                mes_fim = st.selectbox("Mês Final", options=list(range(1, 13)), index=11)
+        with col2:
+            ano_fim = st.selectbox("Ano Final", options=list(range(2020, 2026)), index=3)
+            mes_fim = st.selectbox("Mês Final", options=list(range(1, 13)), index=11)
         
             df = pd.DataFrame(columns=["search_date", "search_count"])
         
@@ -182,47 +182,47 @@ def painel_gestor():
                     st.write("📈 **Gráfico de Produção**")
                     st.bar_chart(df.set_index("search_date"))
                  
-        with aba_metricas_pesquisadores:
-            st.header("Métricas dos pesquisadores")
-            aba_cotacoes, aba_comissao = st.tabs(["Cotações", "Comissão"])
+    with aba_metricas_pesquisadores:
+        st.header("Métricas dos pesquisadores")
+        aba_cotacoes, aba_comissao = st.tabs(["Cotações", "Comissão"])
 
-            with aba_cotacoes:
-                st.header("Cotações")
-                pesquisadores2 = listar_pesquisadores()
-                pesquisador_opcoes2 = {p[1]: p[0] for p in pesquisadores2}  # {'nome': id}
-                pesquisador_escolhido2 = st.selectbox("Pesquisador", ["Nome do pesquisador"] + list(pesquisador_opcoes2.keys()), key="nome_pesquisador")
-                # Entrada de datas
-                data_inicial = st.date_input("Data Inicial", key="data_inicial")
-                data_final = st.date_input("Data Final", key="data_final")
+        with aba_cotacoes:
+            st.header("Cotações")
+            pesquisadores2 = listar_pesquisadores()
+            pesquisador_opcoes2 = {p[1]: p[0] for p in pesquisadores2}  # {'nome': id}
+            pesquisador_escolhido2 = st.selectbox("Pesquisador", ["Nome do pesquisador"] + list(pesquisador_opcoes2.keys()), key="nome_pesquisador")
+            # Entrada de datas
+            data_inicial = st.date_input("Data Inicial", key="data_inicial")
+            data_final = st.date_input("Data Final", key="data_final")
 
-                if st.button("Buscar", key="key_calcular_comissoes"):
+            if st.button("Buscar", key="key_calcular_comissoes"):
 
-                    # Verificando se o nome digitado é válido apenas quando o botão for pressionado
-                    if pesquisador_escolhido2 not in pesquisador_opcoes2:
-                        st.error("Nome do pesquisador inválido! Por favor, selecione um pesquisador da lista.")
+                # Verificando se o nome digitado é válido apenas quando o botão for pressionado
+                if pesquisador_escolhido2 not in pesquisador_opcoes2:
+                    st.error("Nome do pesquisador inválido! Por favor, selecione um pesquisador da lista.")
+                    st.stop()
+
+                pesquisador_id2 = pesquisador_opcoes2[pesquisador_escolhido2]
+
+                try:
+                    # Convertendo para string no formato correto
+                    data_inicial_str = data_inicial.strftime("%Y-%m-%d")
+                    data_final_str = data_final.strftime("%Y-%m-%d")
+
+                    # Validando se a data final é menor que a data inicial
+                    if data_final < data_inicial:
+                        st.error("A Data Final não pode ser anterior à Data Inicial.")
                         st.stop()
+                except Exception as e:
+                    st.error(f"Erro ao processar as datas")
+                    st.stop()
 
-                    pesquisador_id2 = pesquisador_opcoes2[pesquisador_escolhido2]
-
-                    try:
-                        # Convertendo para string no formato correto
-                        data_inicial_str = data_inicial.strftime("%Y-%m-%d")
-                        data_final_str = data_final.strftime("%Y-%m-%d")
-
-                        # Validando se a data final é menor que a data inicial
-                        if data_final < data_inicial:
-                            st.error("A Data Final não pode ser anterior à Data Inicial.")
-                            st.stop()
-                    except Exception as e:
-                        st.error(f"Erro ao processar as datas")
-                        st.stop()
-
-                    # Buscar e exibir os dados
-                    tabela = count_inputs_researcher(pesquisador_id2, data_inicial_str, data_final_str)
-                    df = pd.DataFrame(tabela, columns=['Data', 'Quantidade'])
-                    total = count_total(pesquisador_id2, data_inicial_str, data_final_str)
-                    st.write((f"Total:{total[0][0]}"))
-                    st.bar_chart(df.set_index('Data'))
+                # Buscar e exibir os dados
+                tabela = count_inputs_researcher(pesquisador_id2, data_inicial_str, data_final_str)
+                df = pd.DataFrame(tabela, columns=['Data', 'Quantidade'])
+                total = count_total(pesquisador_id2, data_inicial_str, data_final_str)
+                st.write((f"Total:{total[0][0]}"))
+                st.bar_chart(df.set_index('Data'))
 
                 # if pesquisador_escolhido2 not in pesquisador_opcoes2:
                 #     st.error("Nome do pesquisador inválido! Por favor, selecione um pesquisador da lista.")
@@ -257,90 +257,90 @@ def painel_gestor():
                 #     # st.pyplot(fig)
                 #     st.bar_chart(df.set_index('Data'))
         
-        with aba_relatorio:
-            st.header("Relatório de Cotações por Pesquisador")
-            sub_aba_consulta, sub_aba_minhas_consultas = st.tabs(["Cotações por Pesquisador", "Minhas Consultas"])
+    with aba_relatorio:
+        st.header("Relatório de Cotações por Pesquisador")
+        sub_aba_consulta, sub_aba_minhas_consultas = st.tabs(["Cotações por Pesquisador", "Minhas Consultas"])
         
-            with sub_aba_consulta:
-                st.subheader("Consultar Cotações por Pesquisador")
+        with sub_aba_consulta:
+            st.subheader("Consultar Cotações por Pesquisador")
 
-                meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", 
+            meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", 
                         "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
 
-                col1, col2, col3, col4 = st.columns(4)
-                with col1:
-                    start_month = st.selectbox("Mês Inicial", meses, index=0, key="start_month_consulta")
-                with col2:
-                    start_year = st.number_input("Ano Inicial", min_value=2000, max_value=2100, value=2024, step=1, key="start_year_consulta")
-                with col3:
-                    end_month = st.selectbox("Mês Final", meses, index=0, key="end_month_consulta")
-                with col4:
-                    end_year = st.number_input("Ano Final", min_value=2000, max_value=2100, value=2024, step=1, key="end_year_consulta")
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                start_month = st.selectbox("Mês Inicial", meses, index=0, key="start_month_consulta")
+            with col2:
+                start_year = st.number_input("Ano Inicial", min_value=2000, max_value=2100, value=2024, step=1, key="start_year_consulta")
+            with col3:
+                end_month = st.selectbox("Mês Final", meses, index=0, key="end_month_consulta")
+            with col4:
+                end_year = st.number_input("Ano Final", min_value=2000, max_value=2100, value=2024, step=1, key="end_year_consulta")
 
-                pesquisadores = listar_pesquisadores()  
-                pesquisador_opcoes = ["Todos"] + [p[1] for p in pesquisadores]
-                pesquisador_escolhido = st.selectbox("Selecionar Pesquisador", pesquisador_opcoes, key="pesquisador_consulta")
+            pesquisadores = listar_pesquisadores()  
+            pesquisador_opcoes = ["Todos"] + [p[1] for p in pesquisadores]
+            pesquisador_escolhido = st.selectbox("Selecionar Pesquisador", pesquisador_opcoes, key="pesquisador_consulta")
 
-                if st.button("Consultar Cotações por Pesquisador"):
-                    pesquisador_id = None if pesquisador_escolhido == "Todos" else next((p[0] for p in pesquisadores if p[1] == pesquisador_escolhido), None)
-
-                    cotacoes = get_researcher_quotations(start_month, start_year, end_month, end_year, pesquisador_id)
-
-                    if cotacoes:
-                        
-
-                        df = pd.DataFrame(cotacoes, columns=["Pesquisador", "Mês", "Total de Cotações"])
-                        df["Mês"] = df["Mês"].str.strip()  
-
-                        st.dataframe(df)
-                    else:
-                        st.warning("Nenhuma cotação encontrada para o período selecionado.")
-
-                    save_quotation_consult(pesquisador_id, start_month, start_year, end_month, end_year)
-                    st.success("Consulta salva com sucesso!")
-
-            with sub_aba_minhas_consultas:
-                st.subheader("Consultas Salvas por Pesquisador")
-
+            if st.button("Consultar Cotações por Pesquisador"):
                 pesquisador_id = None if pesquisador_escolhido == "Todos" else next((p[0] for p in pesquisadores if p[1] == pesquisador_escolhido), None)
 
-                consultas = get_quotation_consults(pesquisador_id)
+                cotacoes = get_researcher_quotations(start_month, start_year, end_month, end_year, pesquisador_id)
 
-                if not consultas:
-                    st.warning("Nenhuma consulta salva encontrada.")
-                elif not isinstance(consultas, list):
-                    st.error("Erro: O retorno não é uma lista de consultas.")
+                if cotacoes:
+                        
+
+                    df = pd.DataFrame(cotacoes, columns=["Pesquisador", "Mês", "Total de Cotações"])
+                    df["Mês"] = df["Mês"].str.strip()  
+
+                    st.dataframe(df)
                 else:
-                    for idx, consulta in enumerate(consultas):
+                    st.warning("Nenhuma cotação encontrada para o período selecionado.")
 
-                        if not isinstance(consulta, dict):
-                            st.error(f"Erro: Consulta {idx} não é um dicionário válido.")
-                            continue
+                save_quotation_consult(pesquisador_id, start_month, start_year, end_month, end_year)
+                st.success("Consulta salva com sucesso!")
 
-                        start_month = consulta.get("start_month", "Mês inválido")
-                        end_month = consulta.get("end_month", "Mês inválido")
-                        start_year = consulta.get("start_year", "Ano inválido")
-                        end_year = consulta.get("end_year", "Ano inválido")
-                        pesquisador_id = consulta.get("pesquisador_id", "Desconhecido")
-                        quotations = consulta.get("quotations", [])
+        with sub_aba_minhas_consultas:
+            st.subheader("Consultas Salvas por Pesquisador")
 
-                        with st.expander(f"Consulta de {start_month} a {end_month} ({start_year} - {end_year})"):
-                            st.write(f"**Pesquisador ID:** {pesquisador_id}")
-                            st.write(f"Período inicial: {start_month} ({start_year})")
-                            st.write(f"Período final: {end_month} ({end_year})")
+            pesquisador_id = None if pesquisador_escolhido == "Todos" else next((p[0] for p in pesquisadores if p[1] == pesquisador_escolhido), None)
+
+            consultas = get_quotation_consults(pesquisador_id)
+
+            if not consultas:
+                st.warning("Nenhuma consulta salva encontrada.")
+            elif not isinstance(consultas, list):
+                st.error("Erro: O retorno não é uma lista de consultas.")
+            else:
+                for idx, consulta in enumerate(consultas):
+
+                    if not isinstance(consulta, dict):
+                        st.error(f"Erro: Consulta {idx} não é um dicionário válido.")
+                        continue
+
+                    start_month = consulta.get("start_month", "Mês inválido")
+                    end_month = consulta.get("end_month", "Mês inválido")
+                    start_year = consulta.get("start_year", "Ano inválido")
+                    end_year = consulta.get("end_year", "Ano inválido")
+                    pesquisador_id = consulta.get("pesquisador_id", "Desconhecido")
+                    quotations = consulta.get("quotations", [])
+
+                    with st.expander(f"Consulta de {start_month} a {end_month} ({start_year} - {end_year})"):
+                        st.write(f"**Pesquisador ID:** {pesquisador_id}")
+                        st.write(f"Período inicial: {start_month} ({start_year})")
+                        st.write(f"Período final: {end_month} ({end_year})")
                             
-                            pesquisador_id = None if pesquisador_escolhido == "Todos" else next((p[0] for p in pesquisadores if p[1] == pesquisador_escolhido), None)
+                        pesquisador_id = None if pesquisador_escolhido == "Todos" else next((p[0] for p in pesquisadores if p[1] == pesquisador_escolhido), None)
 
-                            quotations = get_researcher_quotations(start_month, start_year, end_month, end_year, pesquisador_id)
+                        quotations = get_researcher_quotations(start_month, start_year, end_month, end_year, pesquisador_id)
                             
-                            if quotations:
-                                df = pd.DataFrame(quotations, columns=["Pesquisador", "Mês", "Total de Cotações"])
-                                df["Mês"] = df["Mês"].str.strip()  
+                        if quotations:
+                            df = pd.DataFrame(quotations, columns=["Pesquisador", "Mês", "Total de Cotações"])
+                            df["Mês"] = df["Mês"].str.strip()  
 
 
-                                st.dataframe(df)
-                            else:
-                                st.warning("Nenhuma cotação encontrada para o período selecionado.")
+                            st.dataframe(df)
+                        else:
+                            st.warning("Nenhuma cotação encontrada para o período selecionado.")
 
     with aba_ranking:
         st.header("Top 10 Pesquisadores")
@@ -395,36 +395,35 @@ def painel_gestor():
         else:
             st.dataframe(df)  # Exibe a tabela completa
 
-
-        #Aba nova da feature P13. Ela chama a função onde pode ser realizado a consulta.
-        with aba_grafico_loja:
-            component_cotacoes_loja()
-
-            
-      with aba_Topdezmensal:           
+    #Aba nova da feature P13. Ela chama a função onde pode ser realizado a consulta.
+    with aba_grafico_loja:
+        component_cotacoes_loja()
+           
+    with aba_Topdezmensal:           
         
         mostrar_top_10_grafico()
-            with aba_comissao:
-                st.header("Comissões")
-                aba_listar_comissao, aba_calcular_comissao = st.tabs(["Listar comissões", "Calcular comissão"])
 
-                with aba_listar_comissao:
-                    st.header("Consulta de comissões")                   
-                    mes = st.selectbox("Mês", [1,2,3,4,5,6,7,8,9,10,11,12], key="mes_comissao_listar")
-                    ano = st.selectbox("Mês", [2024,2025], key="ano_comissao_listar")
+    with aba_comissao:
+        st.header("Comissões")
+        aba_listar_comissao, aba_calcular_comissao = st.tabs(["Listar comissões", "Calcular comissão"])
+
+        with aba_listar_comissao:
+            st.subheader("Consulta de comissões")                   
+            mes = st.selectbox("Mês", [1,2,3,4,5,6,7,8,9,10,11,12], key="mes_comissao_listar")
+            ano = st.selectbox("Ano", [2024,2025], key="ano_comissao_listar")
                         
-                    if st.button("Buscar", key="key_listar _comicoes"):
-                        comissoes = commission_consult(mes,ano)
-                        st.write(comissoes)
+            if st.button("Buscar", key="key_listar _comicoes"):
+                comissoes = commission_consult(mes,ano)
+                st.write(comissoes)
 
-                with aba_calcular_comissao:
-                    st.header("Calculo de comissões")  
-                    mes = st.selectbox("Mês", [1,2,3,4,5,6,7,8,9,10,11,12], key="mes_comissao_calcular")
-                    ano = st.selectbox("Mês", [2024,2025], key="ano_comissao_calcular")
+        with aba_calcular_comissao:
+            st.subheader("Calculo de comissões")  
+            mes = st.selectbox("Mês", [1,2,3,4,5,6,7,8,9,10,11,12], key="mes_comissao_calcular")
+            ano = st.selectbox("Ano", [2024,2025], key="ano_comissao_calcular")
                     
-                    if st.button("Calcular", key="key_calcular _comissoes"):
-                        comissoes = insert_commission(mes,ano)
-                        st.success(comissoes)       
+            if st.button("Calcular", key="key_calcular _comissoes"):
+                comissoes = insert_commission(mes,ano)
+                st.success(comissoes)       
             
 if __name__ == "__main__":
     painel_gestor()

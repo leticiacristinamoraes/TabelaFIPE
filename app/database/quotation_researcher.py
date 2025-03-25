@@ -78,12 +78,12 @@ def get_researcher_quotations(start_month, start_year, end_month, end_year, pesq
 
     query = """
         SELECT u.nome AS pesquisador, 
-               TO_CHAR(p.data_cotacao, 'Month') AS mes, 
+               TO_CHAR(p.data, 'Month') AS mes, 
                COUNT(p.id) AS total_cotacoes
         FROM users u
         JOIN stores s ON u.id = s.pesquisador_id
         JOIN prices p ON s.id = p.loja_id
-        WHERE p.data_cotacao BETWEEN %s AND %s
+        WHERE p.data BETWEEN %s AND %s
     """
 
     params = [data_inicio, data_fim]

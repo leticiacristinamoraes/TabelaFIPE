@@ -28,10 +28,9 @@ def create_all_tables():
     create_producaomens_table()
     criar_funcao_media()
     criar_funcao_topdez()
-
+    create_quotation_consults_table()
     create_researcher_commission_table()
     create_quotation_researcher_table()
-    create_quotation_consults_table()
     create_ranking_researchers_table()
 
     print("Todas as tabelas foram criadas com sucesso!")
