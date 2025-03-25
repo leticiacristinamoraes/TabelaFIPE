@@ -62,7 +62,7 @@ def insert_models():
         (7, "March"), (7, "Versa"), (7, "Sentra"), (7, "Frontier"), (7, "Kicks"),
         (8, "Uno"), (8, "Mobi"), (8, "Argo"), (8, "Toro"), (8, "Cronos"),
         (9, "Kwid"), (9, "Sandero"), (9, "Logan"), (9, "Duster"), (9, "Captur"),
-        (10, "Renegade"), (10, "Compass"), (10, "Commander"), (10, "Cherokee"), (10, "Wrangler")
+        (10, "Renegade"), (10, "Compass"), (10, "Commander"), (10, "Cherokee"), (10, "Wrangler"),
         (1, "Fiesta"), (1, "Focus"), (1, "Ka"),
         (2, "Onix"), (2, "Prisma"), (2, "Tracker"),
         (3, "Corolla"), (3, "Hilux"), (3, "Yaris"),
@@ -174,7 +174,7 @@ def insert_stores():
         ("Speed Veículos", "Rua XV de Novembro, 258", "66.666.666/0001-66", pesquisador_id),
         ("Auto Fácil", "Praça das Nações, 753", "77.777.777/0001-77", pesquisador_id),
         ("Master Motors", "Boulevard Shopping, 159", "88.888.888/0001-88", pesquisador_id),
-        ("City Cars", "Avenida Independência, 357", "99.999.999/0001-99", pesquisador_id)
+        ("City Cars", "Avenida Independência, 357", "99.999.999/0001-99", pesquisador_id),
         ("AutoCar", "Rua 1", "00.000.000/0001-00"),
         ("SuperCarros", "Rua 2", "11.111.111/0001-11"),
         ("CarCenter", "Rua 3", "22.222.222/0001-22"),
@@ -228,7 +228,7 @@ def insert_users():
         ("Letícia", "leticiacristinafmds@gmail.com", "gestor"),
         ("Juca", "usuariodetestetestando@gmail.com", "pesquisador"),
         ("França", "leehcristinna@gmail.com", "gestor"),
-        ("Hilario", "hilarioglobo2025@gmail.com", "pesquisador")
+        ("Hilario", "hilarioglobo2025@gmail.com", "pesquisador"),
         ("Alice", "alice@email.com", "pesquisador"),
         ("Bob", "bob@email.com", "pesquisador"),
         ("Carlos", "carlos@email.com", "gestor"),
@@ -363,6 +363,7 @@ def populate_database():
     insert_models()
     insert_vehicles()
     insert_users()
+    insert_producao_mediamensal()
     insert_stores()
     insert_prices()
     insert_average_prices()
@@ -371,3 +372,40 @@ def populate_database():
 # Executar a função principal
 if __name__ == "__main__":
     populate_database()
+
+
+import random
+
+def insert_producao_mediamensal():
+    
+    
+    conn = get_connection()
+    cur = conn.cursor()
+
+    
+    if record_exists("SELECT 1 FROM producao_mediamensal_pesquisador LIMIT 1;"):
+        print("✅ Dados de produção já inseridos.")
+        cur.close()
+        conn.close()
+        return
+    
+    
+    producao = [
+        (pesquisador_id, 2024, 4, round(random.uniform(10, 30), 1))
+        for pesquisador_id in range(11, 21)
+    ]
+
+    query = """
+        INSERT INTO producao_mediamensal_pesquisador (pesquisador_id, ano, mes, media_pesquisas_diarias) 
+        VALUES (%s, %s, %s, %s)
+        ON CONFLICT DO NOTHING;
+    """
+    
+    for registro in producao:
+        cur.execute(query, registro)
+
+    conn.commit()
+    cur.close()
+    conn.close()
+    print("✅ Produção média mensal inserida com sucesso!")
+
