@@ -22,10 +22,12 @@ def create_research_stats_table():
     conn.close()
 
 def get_research_data(pesquisador_id, ano_inicio, mes_inicio, ano_fim, mes_fim):
+
+    create_research_stats_table()
+
     conn = get_connection()
     cur = conn.cursor()
 
-    
     _, last_day = monthrange(ano_fim, mes_fim)
 
     cur.execute("""
@@ -40,4 +42,3 @@ def get_research_data(pesquisador_id, ano_inicio, mes_inicio, ano_fim, mes_fim):
     conn.close()
 
     return pd.DataFrame(data, columns=["search_date", "search_count"])
-

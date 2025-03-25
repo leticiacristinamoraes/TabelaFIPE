@@ -1,3 +1,4 @@
+from app.database.research_stats import create_research_stats_table
 from database.month_cotation_store import create_month_cotation_store_table
 from database.users import create_users_table
 from database.brands import create_brands_table
