@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 import threading
 import time
+import schedule
 import sys
 import pandas as pd
 import psycopg2
